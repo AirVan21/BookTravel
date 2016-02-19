@@ -1,24 +1,24 @@
 package ru.spbau;
 
-import ru.spbau.jsonParser.DataHandler;
+import ru.spbau.epubParser.EPUBHandler;
+import ru.spbau.jsonParser.JSONHandler;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String url = "https://raw.githubusercontent.com/David-Haim/CountriesToCitiesJSON/master/countriesToCities.json";
-        String path = "./data/countriesToCitiesFile.json";
+        String jsonPath = "./data/countriesToCitiesFile.json";
+        String bookPath = "./data/BratstvoKoljca.epub";
 
-        try {
-            final String russia = "Russia";
-            Map<String, List<String>> jsonData = DataHandler.handlePath(path);
-            List<String> towns = jsonData.get(russia);
-            System.out.println(towns);
-        } catch (IOException e) {
-            e.printStackTrace();
+        Map<String, List<String>> jsonData = JSONHandler.readFromPath(jsonPath);
+        for (String countryName : jsonData.keySet()) {
+            System.out.println(countryName + ": " + jsonData.get(countryName).size());
         }
+
+        System.out.println(EPUBHandler.readFromPath(bookPath));
     }
 }
