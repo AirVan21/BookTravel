@@ -40,6 +40,8 @@ public class NERWrapper {
      * Retrieves if sentence has geo-location tag.
      * Multi-word get-locations will be merged in one string.
      *
+     * Question: What should we do with "Fairbanks, Alaska"?
+     *
      * @param sentence
      * @param locationMap
      */

@@ -33,4 +33,12 @@ public class EPUBHandler {
         return Jsoup.parse(text).text();
     }
 
+    public static String readBookTitleFromPath(String pathToEPUB) throws IOException {
+        EpubReader epubReader = new EpubReader();
+        Book book = epubReader.readEpub(new FileInputStream(pathToEPUB));
+
+        return book.getTitle();
+    }
+
+
 }
