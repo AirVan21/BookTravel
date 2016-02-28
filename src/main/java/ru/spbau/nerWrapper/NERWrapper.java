@@ -1,15 +1,11 @@
 package ru.spbau.nerWrapper;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
-import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import ru.spbau.locationRecord.LocationRecord;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Named Entity Recognizer Wrapper
@@ -18,22 +14,19 @@ public class NERWrapper {
     private AbstractSequenceClassifier<CoreLabel> classifier;
     private final static String searchTag = "LOCATION";
 
-    /**
-     * Exception throwing constructor. Rewrite?
-     */
-    public NERWrapper (String pathToClassifier) throws IOException, ClassNotFoundException {
-        classifier = CRFClassifier.getClassifier(pathToClassifier);
+    public NERWrapper (AbstractSequenceClassifier<CoreLabel> serializedClassifier)  {
+        classifier = serializedClassifier;
     }
 
-    public Map<String, List<CoreLabel>> classifyBook(String pathToBook) {
+    public List<LocationRecord> classifyBook(String pathToBook) {
         List<List<CoreLabel>> taggedText = classifier.classify(pathToBook);
-        Map<String, List<CoreLabel>> locationMap = new HashMap<String, List<CoreLabel>>();
+        List<LocationRecord> locationList = new ArrayList<LocationRecord>();
 
         for (List<CoreLabel> sentence : taggedText) {
-            handleLocation(sentence, locationMap);
+            handleLocation(sentence, locationList);
         }
 
-        return locationMap;
+        return locationList;
     }
 
     /**
@@ -43,9 +36,9 @@ public class NERWrapper {
      * Question: What should we do with "Fairbanks, Alaska"?
      *
      * @param sentence
-     * @param locationMap
+     * @param locationList
      */
-    private void handleLocation(List<CoreLabel> sentence, Map<String, List<CoreLabel>> locationMap) {
+    private void handleLocation(List<CoreLabel> sentence, List<LocationRecord> locationList) {
         Iterator<CoreLabel> sentenceIterator = sentence.iterator();
 
         while (sentenceIterator.hasNext()) {
@@ -63,7 +56,7 @@ public class NERWrapper {
                         break; // Geo-location ended
                     }
                 }
-                locationMap.put(locationName, sentence);
+                locationList.add(new LocationRecord(locationName, sentence));
             }
         }
     }

@@ -17,8 +17,13 @@ import static java.nio.file.Paths.get;
  * Created by airvan21 on 15.02.16.
  */
 public class JSONHandler {
+    private Gson gson;
 
-    public static Map<String, List<String>> readFromLink(String urlToJSON) throws IOException {
+    public JSONHandler() {
+        gson = new Gson();
+    }
+
+    public  Map<String, List<String>> readFromLink(String urlToJSON) throws IOException {
         URL url = new URL(urlToJSON);
         HttpURLConnection request = (HttpURLConnection) url.openConnection();
         request.connect();
@@ -30,16 +35,13 @@ public class JSONHandler {
         }
         reader.close();
 
-        Gson gson = new Gson();
         Type gsonType = new TypeToken<Map<String, List<String>>>() {}.getType();
 
         return gson.fromJson(resultLine, gsonType);
     }
 
-    public static Map<String, List<String>> readFromPath(String pathToJSON) throws IOException {
+    public  Map<String, List<String>> readFromPath(String pathToJSON) throws IOException {
         String resultLine = new String(readAllBytes(get(pathToJSON)));
-
-        Gson gson = new Gson();
         Type gsonType = new TypeToken<HashMap<String, ArrayList<String>>>() {}.getType();
 
         return gson.fromJson(resultLine, gsonType);

@@ -1,9 +1,6 @@
 package ru.spbau.epubParser;
 
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.Spine;
-import nl.siegmann.epublib.domain.SpineReference;
+import nl.siegmann.epublib.domain.*;
 import nl.siegmann.epublib.epub.EpubReader;
 import org.jsoup.Jsoup;
 
@@ -33,11 +30,11 @@ public class EPUBHandler {
         return Jsoup.parse(text).text();
     }
 
-    public static String readBookTitleFromPath(String pathToEPUB) throws IOException {
+    public static Metadata readBookMetadataFromPath(String pathToEPUB) throws IOException {
         EpubReader epubReader = new EpubReader();
         Book book = epubReader.readEpub(new FileInputStream(pathToEPUB));
 
-        return book.getTitle();
+        return book.getMetadata();
     }
 
 
