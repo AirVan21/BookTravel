@@ -1,7 +1,10 @@
 package ru.spbau.archiveManager;
 
 import nl.siegmann.epublib.domain.Metadata;
+import org.mongodb.morphia.Datastore;
+import ru.spbau.database.DataBaseRecord;
 import ru.spbau.epubParser.EPUBHandler;
+import ru.spbau.locationRecord.LocationData;
 import ru.spbau.locationRecord.LocationRecord;
 import ru.spbau.nerWrapper.NERWrapper;
 
@@ -17,19 +20,15 @@ import java.util.List;
  */
 public class ArchiveManager {
 
-    static public void generateGsonArchive(String pathToIndexFile, String pathToOutputDir,
-                                           NERWrapper locationNER) {
+    static public void generateDataBase(String pathToIndexFile, NERWrapper locationNER, Datastore ds) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile));
 
-            for(String pathToBook; (pathToBook = reader.readLine()) != null; ) {
-                List<LocationRecord> locationList = processBook(pathToBook, locationNER);
+            for (String pathToBook; (pathToBook = reader.readLine()) != null;) {
+                List<LocationData> locationList = processBook(pathToBook, locationNER);
                 Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
-                // Organize output to json via Gson
-                System.out.println(bookMetadata.getAuthors());
-                System.out.println(bookMetadata.getTitles());
-                System.out.println(locationList.get(0).getLocationData().geocodingHelp[0].formattedAddress);
-                System.out.println();
+                DataBaseRecord dbRecord = new DataBaseRecord(bookMetadata, locationList);
+                ds.save(dbRecord);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -43,8 +42,9 @@ public class ArchiveManager {
             BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile));
 
             for(String pathToBook; (pathToBook = reader.readLine()) != null; ) {
-                List<LocationRecord> locationList = processBook(pathToBook, locationNER);
-                // Some printing output information code
+                List<LocationData> locationList = processBook(pathToBook, locationNER);
+                Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
+                DataBaseRecord dbRecord = new DataBaseRecord(bookMetadata, locationList);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -61,15 +61,15 @@ public class ArchiveManager {
      * @param pathToBook
      * @param locationNER
      */
-    static private List<LocationRecord> processBook(String pathToBook, NERWrapper locationNER) {
-        List<LocationRecord> filteredLocationList = new ArrayList<LocationRecord>();
+    static private List<LocationData> processBook(String pathToBook, NERWrapper locationNER) {
+        List<LocationData> filteredLocationList = new ArrayList<>();
         try {
             String book = EPUBHandler.readFromPath(pathToBook);
             List<LocationRecord> rawLocationList = locationNER.classifyBook(book);
 
             for (LocationRecord location : rawLocationList) {
                 if (location.validateKeyword()) {
-                    filteredLocationList.add(location);
+                    filteredLocationList.add(location.getLocationData());
                 }
             }
         } catch (IOException e) {

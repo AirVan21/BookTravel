@@ -1,6 +1,5 @@
 package ru.spbau.locationRecord;
 
-import com.google.maps.model.GeocodingResult;
 import edu.stanford.nlp.ling.CoreLabel;
 
 import java.util.List;
@@ -10,11 +9,21 @@ import java.util.List;
  */
 public class LocationData {
     public String keyword;
-    public List<CoreLabel> sentence;
-    public GeocodingResult[] geocodingHelp;
+    public String sentence;
+    public List<GeocodingResultSimple> geocodingHelp;
+
+    public LocationData() {}
 
     public LocationData(String keyFromText, List<CoreLabel> sentenceFromText) {
         keyword = keyFromText;
-        sentence = sentenceFromText;
+        sentence = buildSentence(sentenceFromText);
+        geocodingHelp = null;
+    }
+
+    private String buildSentence(List<CoreLabel> sentenceFromText) {
+        StringBuilder buf = new StringBuilder();
+        sentenceFromText.forEach(coreLabel -> buf.append(coreLabel.value()));
+
+        return buf.toString();
     }
 }

@@ -51,6 +51,12 @@
             <artifactId>google-maps-services</artifactId>
             <version>0.1.11</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mongodb.morphia</groupId>
+            <artifactId>morphia</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -5,6 +5,7 @@ import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
 import edu.stanford.nlp.ling.CoreLabel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +14,11 @@ import java.util.List;
 public class LocationRecord {
 
     private LocationData locationData;
-    static final String googleAPICode = ""; // input your unique key
+    /**
+     * googleAPICode - is unique key per account
+     */
+    private static final String googleAPICode = "";
+    private static final GeoApiContext context = new GeoApiContext().setApiKey(googleAPICode);
 
     public LocationRecord(String keyFromText, List<CoreLabel> sentenceFromText) {
         locationData = new LocationData(keyFromText, sentenceFromText);
@@ -27,16 +32,21 @@ public class LocationRecord {
         try {
             locationData.geocodingHelp = requestGeoInfo();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Google geocoding API threw Exception on input = "
+                    + locationData.keyword);
+            System.out.println("Awaiting was unsuccessful!");
         }
 
-        return (locationData.geocodingHelp.length > 0);
+        return (locationData.geocodingHelp.size() > 0);
     }
 
-    private GeocodingResult[] requestGeoInfo() throws Exception {
-        GeoApiContext context = new GeoApiContext().setApiKey(googleAPICode);
+    private List<GeocodingResultSimple> requestGeoInfo() throws Exception {
         GeocodingResult[] geoInformation =  GeocodingApi.geocode(context, locationData.keyword).await();
+        List<GeocodingResultSimple> geoResult = new ArrayList<>();
+        for (GeocodingResult info : geoInformation) {
+            geoResult.add(new GeocodingResultSimple(info));
+        }
 
-        return geoInformation;
+        return geoResult;
     }
 }
