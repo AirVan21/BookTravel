@@ -17,7 +17,7 @@ public class LocationRecord {
     /**
      * googleAPICode - is unique key per account
      */
-    private static final String googleAPICode = "";
+    private static final String googleAPICode = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     private static final GeoApiContext context = new GeoApiContext().setApiKey(googleAPICode);
 
     public LocationRecord(String keyFromText, List<CoreLabel> sentenceFromText) {
@@ -37,7 +37,7 @@ public class LocationRecord {
             System.out.println("Awaiting was unsuccessful!");
         }
 
-        return (locationData.geocodingHelp.size() > 0);
+        return locationData.geocodingHelp != null ? locationData.geocodingHelp.size() > 0 : false;
     }
 
     private List<GeocodingResultSimple> requestGeoInfo() throws Exception {
