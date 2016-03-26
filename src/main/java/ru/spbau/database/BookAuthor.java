@@ -36,5 +36,4 @@ public class BookAuthor {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
 }

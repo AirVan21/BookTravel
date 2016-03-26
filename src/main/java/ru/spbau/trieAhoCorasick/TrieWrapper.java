@@ -12,13 +12,12 @@ import java.util.Map;
 public class TrieWrapper {
 
     public static Trie buildTrie(Map<String, List<String>> searchWords) {
-        Trie.TrieBuilder trieBuilder = Trie.builder().onlyWholeWordsWhiteSpaceSeparated();
-        for (List<String> values : searchWords.values()) {
-            for (String value : values) {
-                trieBuilder.addKeyword(value);
-            }
+        Trie.TrieBuilder trieBuilder = Trie.builder().caseInsensitive().onlyWholeWordsWhiteSpaceSeparated();
+        for (Map.Entry<String, List<String>> values : searchWords.entrySet()) {
+            values.getValue().forEach(cityName -> trieBuilder.addKeyword(cityName));
+            trieBuilder.addKeyword(values.getKey());
         }
 
-        return trieBuilder.build();
+        return trieBuilder.caseInsensitive().onlyWholeWordsWhiteSpaceSeparated().build();
     }
 }

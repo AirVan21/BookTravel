@@ -1,11 +1,11 @@
 package ru.spbau.archiveManager;
 
 import nl.siegmann.epublib.domain.Metadata;
-import org.ahocorasick.trie.Trie;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
+import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
-import ru.spbau.database.DataBaseRecord;
+import ru.spbau.database.CityCoordinates;
+import ru.spbau.database.CityRecord;
 import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.locationRecord.LocationData;
 import ru.spbau.locationRecord.LocationRecord;
@@ -16,24 +16,27 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by airvan21 on 23.02.16.
  */
 public class ArchiveManager {
 
-    static public void generateDataBase(String pathToIndexFile, NERWrapper locationNER, Datastore ds, Trie trie) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile));
-
+    static public void generateBookDataBase(String pathToIndexFile, NERWrapper locationNER,
+                                            Datastore ds, Datastore validate) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile))) {
             for (String pathToBook; (pathToBook = reader.readLine()) != null;) {
-                List<LocationData> locationList = processBook(pathToBook, locationNER, trie);
+                List<LocationData> locationList = processBook(pathToBook, locationNER, validate);
                 Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
 
                 BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
-//                bookRecord.consoleLog();
-                ds.save(bookRecord);
+                if (bookRecord.language.equals("en")) {
+                    bookRecord.consoleLog();
+                    ds.save(bookRecord);
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -42,20 +45,24 @@ public class ArchiveManager {
         }
     }
 
-    static public void handleBookArchive(String pathToIndexFile, NERWrapper locationNER, Trie trie) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile));
+    static public void generateCityDataBase(List<CityEntry> entires, Datastore ds) {
+        Map<String, List<CityCoordinates>> storage = new HashMap<>();
+        final double populationThreshold = 10_000;
 
-            for(String pathToBook; (pathToBook = reader.readLine()) != null; ) {
-                List<LocationData> locationList = processBook(pathToBook, locationNER, trie);
-                Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
-                DataBaseRecord dbRecord = new DataBaseRecord(bookMetadata, locationList);
+        for (CityEntry city : entires) {
+            if (city.getPopulation() > populationThreshold) {
+                storage.putIfAbsent(city.getFormattedName(), new ArrayList<>());
+                storage.get(city.getFormattedName()).add(new CityCoordinates(
+                        city.getCountry(), city.getProvince(), city.getLat(), city.getLng()
+                ));
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        for (Map.Entry<String, List<CityCoordinates>> item : storage.entrySet()) {
+            CityRecord record = new CityRecord(item.getKey(), item.getValue());
+            ds.save(record);
+        }
+
     }
 
     /**
@@ -67,19 +74,15 @@ public class ArchiveManager {
      * @param pathToBook
      * @param locationNER
      */
-    static private List<LocationData> processBook(String pathToBook, NERWrapper locationNER, Trie trie) {
+    static private List<LocationData> processBook(String pathToBook, NERWrapper locationNER, Datastore validate) {
         List<LocationData> filteredLocationList = new ArrayList<>();
         try {
             String book = EPUBHandler.readFromPath(pathToBook);
             List<LocationRecord> rawLocationList = locationNER.classifyBook(book);
 
             for (LocationRecord location : rawLocationList) {
-                System.out.print(location.getLocationData().keyword);
-                if (location.validateKeyword(trie)) {
-                    System.out.println(" -- OK");
+                if (location.validateKeywordDB(validate)) {
                     filteredLocationList.add(location.getLocationData());
-                } else {
-                    System.out.println(" -- NOK");
                 }
             }
         } catch (IOException e) {

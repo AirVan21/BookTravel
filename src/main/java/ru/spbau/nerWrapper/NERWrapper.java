@@ -20,7 +20,7 @@ public class NERWrapper {
 
     public List<LocationRecord> classifyBook(String pathToBook) {
         List<List<CoreLabel>> taggedText = classifier.classify(pathToBook);
-        List<LocationRecord> locationList = new ArrayList<LocationRecord>();
+        List<LocationRecord> locationList = new ArrayList<>();
 
         for (List<CoreLabel> sentence : taggedText) {
             handleLocation(sentence, locationList);
@@ -35,8 +35,8 @@ public class NERWrapper {
      *
      * Question: What should we do with "Fairbanks, Alaska"?
      *
-     * @param sentence
-     * @param locationList
+     * @param sentence from epub-book
+     * @param locationList location retrieved from sentence
      */
     private void handleLocation(List<CoreLabel> sentence, List<LocationRecord> locationList) {
         Iterator<CoreLabel> sentenceIterator = sentence.iterator();

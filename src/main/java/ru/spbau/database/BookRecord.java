@@ -1,6 +1,5 @@
 package ru.spbau.database;
 
-import edu.stanford.nlp.util.Pair;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Metadata;
 
@@ -63,7 +62,6 @@ public class BookRecord {
 
         System.out.println(title);
         System.out.println(language);
-        System.out.println(authors);
 
         System.out.println("-----------------------------------------------------------------");
         for (LocationPair location : cities) {

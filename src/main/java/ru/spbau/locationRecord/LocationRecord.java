@@ -4,6 +4,11 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
 import edu.stanford.nlp.ling.CoreLabel;
+import org.ahocorasick.trie.Trie;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import ru.spbau.database.BookRecord;
+import ru.spbau.database.CityRecord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +33,24 @@ public class LocationRecord {
         return locationData;
     }
 
-    public boolean validateKeyword() {
+
+    /**
+     * Validation of keyword via finding match in MongoDB
+     *
+     * @return true - valid location; false - invalid location
+     */
+    public boolean validateKeywordDB(Datastore validate) {
+        List<CityRecord> query = validate.find(CityRecord.class).field("cityName").equal(locationData.keyword).asList();
+
+        return !query.isEmpty();
+    }
+
+    /**
+     * Temporary disabled service for information retrieving via Google API
+     *
+     * @return true - valid location; false - invalid location
+     */
+    private boolean validateKeywordWeb() {
         try {
             locationData.geocodingHelp = requestGeoInfo();
         } catch (Exception e) {
@@ -37,7 +59,7 @@ public class LocationRecord {
             System.out.println("Awaiting was unsuccessful!");
         }
 
-        return locationData.geocodingHelp != null ? locationData.geocodingHelp.size() > 0 : false;
+        return locationData.geocodingHelp != null && locationData.geocodingHelp.size() > 0;
     }
 
     private List<GeocodingResultSimple> requestGeoInfo() throws Exception {

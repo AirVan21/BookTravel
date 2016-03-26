@@ -1,6 +1,7 @@
 package ru.spbau.locationRecord;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Sentence;
 
 import java.util.List;
 
@@ -16,14 +17,7 @@ public class LocationData {
 
     public LocationData(String keyFromText, List<CoreLabel> sentenceFromText) {
         keyword = keyFromText;
-        sentence = buildSentence(sentenceFromText);
+        sentence = Sentence.listToOriginalTextString(sentenceFromText);
         geocodingHelp = null;
-    }
-
-    private String buildSentence(List<CoreLabel> sentenceFromText) {
-        StringBuilder buf = new StringBuilder();
-        sentenceFromText.forEach(coreLabel -> buf.append(coreLabel.value()));
-
-        return buf.toString();
     }
 }
