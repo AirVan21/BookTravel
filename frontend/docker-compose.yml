@@ -1,0 +1,27 @@
+db:
+  image: mongo
+  volumes:
+    - ./db:/data/db
+    - ./logs:/var/log/mongodb
+  command: --profile=1 --slowms=100
+
+web:
+  image: nizshee/geobook:0.2
+  working_dir: /code
+  command: [app-1.0-SNAPSHOT/bin/app, -Dplay.crypto.secret=AosjciSWGnqmEX5ZW6hd8cdCR8Qh]
+  ports:
+    - "80:9000"
+  links:
+    - db
+
+db_restore:
+  image: mongo
+  volumes:
+    - ./dump/Cities:/data/Cities
+    - ./dump/Books:/data/Books
+  command: |
+    bash -c "
+    mongorestore -h db --drop --db geobook --collection cities /data/Cities/City.bson;
+    mongorestore -h db --drop --db geobook --collection books /data/Books/Book.bson;"
+  links:
+    - db

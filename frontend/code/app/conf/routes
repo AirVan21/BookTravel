@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+GET     /help                       controllers.Application.help
+
+# API
+GET /city/search/:id controllers.CityCntrl.search(id: String)
+
+GET /book/search/:id controllers.BookCntrl.search(id: String)
+GET /book/get/:id    controllers.BookCntrl.get(id: String)
+GET /book/:id        controllers.BookCntrl.page(id: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

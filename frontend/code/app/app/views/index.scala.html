@@ -1,0 +1,81 @@
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.js"></script>
+
+  <!-- <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/app.css")"> -->
+  <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+</head>
+
+<body ng-app="MyApp" ng-cloak>
+
+  <md-toolbar layout="row" >
+    <h1>Ultimate Book Search Service</h1>
+  </md-toolbar>
+
+  <div ng-controller="AutocompleteCtrl as ctrl" layout="column" ng-cloak>
+    <md-content class="md-padding">
+      <form ng-submit="$event.preventDefault()">
+        <md-autocomplete
+            ng-disabled="ctrl.isDisabled"
+            md-no-cache="ctrl.noCache"
+            md-selected-item="ctrl.selectedItem"
+            md-search-text="ctrl.searchText"
+            md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+            md-selected-item-change="ctrl.selectedItemChange(item)"
+            md-items="item in ctrl.querySearch(ctrl.searchText)"
+            md-item-text="item.name"
+            md-min-length="0"
+            placeholder="What city do you need?">
+          <md-item-template>
+            <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.name}}</span>
+          </md-item-template>
+          <md-not-found>
+            No cities matching "{{ctrl.searchText}}" were found.
+          </md-not-found>
+        </md-autocomplete>
+        <br/>
+      </form>
+    </md-content>
+  </div>
+
+  <div flex ng-controller="ResultCtrl as ctrl">
+    <md-list>
+      <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.books" ng-href="book/{{book.id}}">
+        <div class="md-list-item-text">
+          <h3> {{ book.title }} </h3>
+          <p> {{ book.quote }} </p>
+        </div>
+        <md-divider ></md-divider>
+      </md-list-item>
+    </md-list>
+  </div>
+
+<!-- 
+  <div layout="row" layout-xs="column">
+    <div flex>
+      <h1>PlaceHolder</h1>
+      <h2>Map may be here</h2>
+    </div>
+    <div flex ng-controller="ResultCtrl as ctrl">
+      <md-list>
+        <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.books" ng-href="book/{{book.title}}">
+          <div class="md-list-item-text">
+            <h3> {{ book.title }} </h3>
+            <p> {{ book.quote }} </p>
+          </div>
+          <md-divider ></md-divider>
+        </md-list-item>
+      </md-list>
+    </div>
+  </div> -->
+</body>
+</html>
