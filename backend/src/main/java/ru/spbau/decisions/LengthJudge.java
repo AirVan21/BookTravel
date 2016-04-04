@@ -5,7 +5,7 @@ package ru.spbau.decisions;
  */
 public class LengthJudge implements Judge {
     public final static int minimalLength = 20;
-    public final static int maximalLength = 500;
+    public final static int maximalLength = 400;
 
     @Override
     public boolean makeDecision(String sentence) {

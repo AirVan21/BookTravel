@@ -24,11 +24,11 @@ public class BookRecord {
 
     public BookRecord() {}
 
-    public BookRecord(Metadata metadata, List<LocationData> locationsFromBook) {
+    public BookRecord(Metadata metadata, List<LocationPair> locationsFromBook) {
         title = metadata.getFirstTitle();
         authors = convertAuthorsList(metadata.getAuthors());
         language = metadata.getLanguage();
-        cities = convertLocationDataToSet(locationsFromBook);
+        cities = locationsFromBook;
     }
 
     private List<BookAuthor> convertAuthorsList(List<Author> authors) {
@@ -36,24 +36,6 @@ public class BookRecord {
         authors.forEach(author -> authorList.add(new BookAuthor(author)));
 
         return authorList;
-    }
-
-    private List<LocationPair> convertLocationDataToSet(List<LocationData> locationsFromBook) {
-        Map<String, List<String>> citiesMap = new TreeMap<>();
-        for (LocationData location : locationsFromBook) {
-            if (citiesMap.containsKey(location.keyword)) {
-                citiesMap.get(location.keyword).add(location.sentence);
-            } else {
-                List<String> sentenceList = new ArrayList<>();
-                sentenceList.add(location.sentence);
-                citiesMap.put(location.keyword, sentenceList);
-            }
-        }
-
-        List<LocationPair> citiesList = new ArrayList<>();
-        citiesMap.entrySet().forEach(location -> citiesList.add(new LocationPair(location.getKey(), location.getValue())));
-
-        return citiesList;
     }
 
     public void consoleLog() {

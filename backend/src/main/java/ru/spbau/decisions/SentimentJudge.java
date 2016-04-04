@@ -50,9 +50,6 @@ public class SentimentJudge implements Judge {
      *  4 - Very Positive
      */
     private int getScore(String sentence) {
-//        Properties props = new Properties();
-//        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-
         int score = 0;
         Annotation annotation = pipeline.process(sentence);
         for (CoreMap quote :  annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
