@@ -22,8 +22,7 @@ public class BookRecord {
     public List<BookAuthor> authors;
     public List<LocationPair> cities;
 
-    public BookRecord() {
-    }
+    public BookRecord() {}
 
     public BookRecord(Metadata metadata, List<LocationData> locationsFromBook) {
         title = metadata.getFirstTitle();

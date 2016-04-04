@@ -9,8 +9,7 @@ public class LocationPair {
     public String cityName;
     public List<String> quotes;
 
-    public LocationPair() {
-    }
+    public LocationPair() {}
 
     public LocationPair(String cityName, List<String> quotes) {
         this.cityName = cityName;

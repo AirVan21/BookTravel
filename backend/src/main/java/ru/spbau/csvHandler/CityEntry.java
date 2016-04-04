@@ -5,7 +5,7 @@ import com.opencsv.bean.CsvBind;
 /**
  * Created by airvan21 on 24.03.16.
  */
-public class CityEntry extends CSVEntry {
+public class CityEntry {
     @CsvBind
     private String formattedName;
     @CsvBind
@@ -19,8 +19,7 @@ public class CityEntry extends CSVEntry {
     @CsvBind
     private String province;
 
-    public CityEntry() {
-    }
+    public CityEntry() {}
 
     public String getCountry() {
         return country;

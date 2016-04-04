@@ -1,5 +1,6 @@
 package ru.spbau.archiveManager;
 
+import jdk.internal.dynalink.beans.StaticClass;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
 import ru.spbau.csvHandler.CityEntry;
@@ -10,6 +11,7 @@ import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.locationRecord.LocationData;
 import ru.spbau.locationRecord.LocationRecord;
 import ru.spbau.nerWrapper.NERWrapper;
+import ru.spbau.statistics.BookStatistics;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -35,7 +37,7 @@ public class ArchiveManager {
                 BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
                 if (bookRecord.language.equals("en")) {
                     bookRecord.consoleLog();
-                    ds.save(bookRecord);
+//                    ds.save(bookRecord);
                 }
             }
         } catch (FileNotFoundException e) {

@@ -16,11 +16,10 @@ public class CityRecord {
     private String cityName;
     private List<CityCoordinates> locations;
 
-    public CityRecord() {
-    }
+    public CityRecord() {}
 
-    public CityRecord(String name, List<CityCoordinates> locations) {
-        cityName = name;
+    public CityRecord(String cityName, List<CityCoordinates> locations) {
+        this.cityName = cityName;
         this.locations = locations;
     }
 
@@ -30,5 +29,13 @@ public class CityRecord {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public List<CityCoordinates> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<CityCoordinates> locations) {
+        this.locations = locations;
     }
 }

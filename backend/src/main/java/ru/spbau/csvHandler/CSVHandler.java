@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class CSVHandler {
 
-    static public List<CityEntry> parse(CSVReader reader) {
+     public static List<CityEntry> parse(CSVReader reader) {
         HeaderColumnNameMappingStrategy<CityEntry> strategy = new HeaderColumnNameMappingStrategy<>();
         strategy.setType(CityEntry.class);
         CsvToBean<CityEntry> csvToBean = new CsvToBean<>();

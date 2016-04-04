@@ -11,15 +11,30 @@ import org.mongodb.morphia.Morphia;
 import ru.spbau.archiveManager.ArchiveManager;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
+import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
 import ru.spbau.nerWrapper.NERWrapper;
+import ru.spbau.statistics.BookStatistics;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 public class Main {
+
+    public static void statisticsQuery() throws IOException {
+        BookStatistics statistics = new BookStatistics();
+        final String pathToTarget = "./data/csv/sentence_length.csv";
+
+        MongoClient mongo = new MongoClient();
+        Datastore datastore = new Morphia().createDatastore(mongo, "Books");
+        List<BookRecord> query = datastore.find(BookRecord.class).asList();
+
+        for (BookRecord record : query) {
+            if (record.cities != null) {
+                statistics.addBookStatistics(record);
+            }
+        }
+    }
 
     public static void runCitiesDBCreation() throws FileNotFoundException {
         final String pathToCSV = "./data/csv/world_cities.csv";
@@ -52,6 +67,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        runBooksDBCreation();
+        statisticsQuery();
     }
 }

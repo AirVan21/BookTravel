@@ -6,8 +6,7 @@ public class CityCoordinates {
     private double lat;
     private double lng;
 
-    public CityCoordinates() {
-    }
+    public CityCoordinates() {}
 
     public CityCoordinates(String country, String province, double lat, double lng) {
         this.country = country;
