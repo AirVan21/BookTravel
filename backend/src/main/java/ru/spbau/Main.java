@@ -31,6 +31,7 @@ public class Main {
 
         for (BookRecord record : query) {
             if (record.cities != null) {
+                // TODO: fix records with empty cities (no not add them to DB)
                 statistics.addBookStatistics(record);
             }
         }

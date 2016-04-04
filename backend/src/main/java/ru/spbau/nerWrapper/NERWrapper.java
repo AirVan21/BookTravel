@@ -19,12 +19,10 @@ public class NERWrapper {
     }
 
     public List<LocationRecord> classifyBook(String pathToBook) {
-        List<List<CoreLabel>> taggedText = classifier.classify(pathToBook);
-        List<LocationRecord> locationList = new ArrayList<>();
+        final List<List<CoreLabel>> taggedText = classifier.classify(pathToBook);
+        final List<LocationRecord> locationList = new ArrayList<>();
 
-        for (List<CoreLabel> sentence : taggedText) {
-            handleLocation(sentence, locationList);
-        }
+        taggedText.forEach(sentence -> handleLocation(sentence, locationList));
 
         return locationList;
     }

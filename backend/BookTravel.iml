@@ -11,7 +11,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.codeartisans:org.json:20130213" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: nl.siegmann.epublib:epublib-core:3.1" level="project" />
     <orderEntry type="library" name="Maven: net.sf.kxml:kxml2:2.3.0" level="project" />
@@ -30,6 +29,7 @@
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.2.7" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.efficient-java-matrix-library:ejml:0.23" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
+    <orderEntry type="library" name="Maven: edu.stanford.nlp:stanford-corenlp:models:3.6.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.maps:google-maps-services:0.1.11" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp:okhttp:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.0.0" level="project" />

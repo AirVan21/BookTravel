@@ -47,6 +47,13 @@
         </dependency>
 
         <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.6.0</version>
+            <classifier>models</classifier>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.maps</groupId>
             <artifactId>google-maps-services</artifactId>
             <version>0.1.11</version>
@@ -63,6 +70,7 @@
             <artifactId>opencsv</artifactId>
             <version>3.7</version>
         </dependency>
+
     </dependencies>
 
 </project>
