@@ -1,7 +1,13 @@
 package ru.spbau.archiveManager;
 
+import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.WordToSentenceProcessor;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
+import ru.spbau.books.processor.BookProcessor;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityCoordinates;
@@ -9,12 +15,9 @@ import ru.spbau.database.CityRecord;
 import ru.spbau.database.LocationPair;
 import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.locationRecord.LocationValidator;
-import ru.spbau.nerWrapper.NERWrapper;
+import ru.spbau.books.nerWrapper.NERWrapper;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
  */
 public class ArchiveManager {
 
-    static public void generateBookDataBase(String pathToIndexFile, NERWrapper locationNER,
+    static public void generateBookDataBase(String pathToIndexFile,  AbstractSequenceClassifier<CoreLabel> classifier,
                                             Datastore ds, Datastore validate) {
         try (BufferedReader reader = new BufferedReader(new FileReader(pathToIndexFile))) {
             LocationValidator validator = new LocationValidator(validate);
@@ -35,15 +38,13 @@ public class ArchiveManager {
                     continue;
                 }
 
-                List<LocationPair> locationList = processBook(pathToBook, locationNER, validator);
+                List<LocationPair> locationList = processBook(pathToBook, classifier, validator);
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
                     bookRecord.consoleLog();
-                    ds.save(bookRecord);
+//                    ds.save(bookRecord);
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,29 +67,27 @@ public class ArchiveManager {
             CityRecord record = new CityRecord(item.getKey(), item.getValue());
             ds.save(record);
         }
-
     }
 
     /**
      * Reads and analyses book content.
      * Validates location keyword via - a) via trained Trie match
-     *                                  b)  via Google Geocoding API.
+     *                                  b) via Google Geocoding API.
      * Returns location records.
      *
-     * @param pathToBook
-     * @param locationNER
      */
-    static private List<LocationPair> processBook(String pathToBook, NERWrapper locationNER, LocationValidator validator) {
-        List<LocationPair> filteredLocationList = new ArrayList<>();
-        try {
-            String book = EPUBHandler.readFromPath(pathToBook);
-            List<LocationPair> rawLocationList = locationNER.classifyBook(book);
-            filteredLocationList = rawLocationList.stream().filter(locationPair -> validator.validateWithDB(locationPair.cityName)).collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    static private List<LocationPair> processBook(String pathToBook, AbstractSequenceClassifier<CoreLabel> classifier,
+                                                  LocationValidator validator) throws IOException {
 
-        return filteredLocationList;
+        BookProcessor processor = new BookProcessor(classifier);
+        List<LocationPair> locationList = processor.processBook(pathToBook);
+
+
+        locationList = locationList.stream()
+                .filter(locationPair -> validator.validateWithDB(locationPair.cityName))
+                .collect(Collectors.toList());
+
+        return locationList;
     }
 
 }

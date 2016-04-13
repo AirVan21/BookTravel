@@ -1,4 +1,4 @@
-package ru.spbau.statistics;
+package ru.spbau.books.statistics;
 
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.LocationPair;

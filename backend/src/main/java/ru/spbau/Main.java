@@ -1,5 +1,7 @@
 package ru.spbau;
 
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.mongodb.MongoClient;
 import com.opencsv.CSVReader;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
@@ -13,8 +15,9 @@ import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
-import ru.spbau.nerWrapper.NERWrapper;
-import ru.spbau.statistics.BookStatistics;
+import ru.spbau.books.nerWrapper.NERWrapper;
+import ru.spbau.books.statistics.BookStatistics;
+import ru.spbau.googleAPI.BookSearcher;
 
 import java.io.*;
 import java.util.List;
@@ -62,12 +65,18 @@ public class Main {
         Datastore datastore = new Morphia().createDatastore(mongoBook, "Books");
 
         AbstractSequenceClassifier<CoreLabel> serializedClassifier = CRFClassifier.getClassifier(pathToSerializedClassifier);
-        NERWrapper locationNER = new NERWrapper(serializedClassifier);
+        ArchiveManager.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
+    }
 
-        ArchiveManager.generateBookDataBase(pathToSmallIndex, locationNER, datastore, citiesDatastore);
+    public static void runBookSearchTest() throws Exception {
+        JsonFactory factory = new JacksonFactory();
+        final String title = "America's War for Humanity";
+        BookSearcher.queryGoogleBooks(factory, title);
+
     }
 
     public static void main(String[] args) throws Exception {
-        runBooksDBCreation();
+//        runBooksDBCreation();
+        runBookSearchTest();
     }
 }

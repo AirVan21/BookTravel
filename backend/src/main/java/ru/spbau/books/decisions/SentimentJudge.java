@@ -1,4 +1,4 @@
-package ru.spbau.decisions;
+package ru.spbau.books.decisions;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -16,15 +16,21 @@ import java.util.Properties;
 public class SentimentJudge implements Judge {
     private final StanfordCoreNLP pipeline;
     private enum SentimentGrade {
-        VeryNegative
-        , Negative
-        , Neutral
-        , Positive
-        , VeryPositive
+        VERY_NEGATIVE
+        , NEGATIVE
+        , NEUTRAL
+        , POSITIVE
+        , VERY_POSITIVE
     }
 
     public SentimentJudge(Properties properties) {
         pipeline = new StanfordCoreNLP(properties);
+    }
+
+    public SentimentJudge() {
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
+        pipeline = new StanfordCoreNLP(props);
     }
 
     /**
@@ -38,7 +44,7 @@ public class SentimentJudge implements Judge {
     public boolean makeDecision(String sentence) {
         int score = getScore(sentence);
 
-        return !(SentimentGrade.Neutral.ordinal() == score);
+        return !(SentimentGrade.NEUTRAL.ordinal() == score);
     }
 
     /**
@@ -49,14 +55,13 @@ public class SentimentJudge implements Judge {
      *  3 - Positive
      *  4 - Very Positive
      */
-    private int getScore(String sentence) {
+    public int getScore(String sentence) {
         int score = 0;
+        // TODO: check score calculation
         Annotation annotation = pipeline.process(sentence);
         for (CoreMap quote :  annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             Tree tree = quote.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-            int sentimental = RNNCoreAnnotations.getPredictedClass(tree);
-            score = Math.max(sentimental, score);
-            System.out.print(quote.get(SentimentCoreAnnotations.SentimentClass.class));
+            score = RNNCoreAnnotations.getPredictedClass(tree);
         }
 
         return score;

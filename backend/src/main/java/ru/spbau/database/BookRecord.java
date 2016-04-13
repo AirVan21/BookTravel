@@ -6,7 +6,7 @@ import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.bson.types.ObjectId;
-import ru.spbau.locationRecord.LocationData;
+import ru.spbau.books.decisions.SentimentJudge;
 
 import java.util.*;
 
@@ -46,13 +46,19 @@ public class BookRecord {
 
         System.out.println("-----------------------------------------------------------------");
         for (LocationPair location : cities) {
+            System.out.println(authors);
             System.out.println("--------------");
             System.out.println(location.cityName);
             System.out.println("--------------");
-            location.quotes.forEach(sentence -> System.out.println(sentence));
+            location.quotes.forEach(sentence -> System.out.println(semtimentScore(sentence) + " " + sentence));
         }
 
         System.out.println("================================================================");
         System.out.println();
+    }
+
+    private int semtimentScore(String sentence) {
+        SentimentJudge judge = new SentimentJudge();
+        return judge.getScore(sentence);
     }
 }

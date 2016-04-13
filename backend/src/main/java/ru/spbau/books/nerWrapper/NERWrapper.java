@@ -1,15 +1,15 @@
-package ru.spbau.nerWrapper;
+package ru.spbau.books.nerWrapper;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Sentence;
+import edu.stanford.nlp.util.Triple;
 import ru.spbau.database.LocationPair;
-import ru.spbau.decisions.LengthJudge;
-import ru.spbau.decisions.SentimentJudge;
-import ru.spbau.locationRecord.LocationRecord;
+import ru.spbau.books.decisions.LengthJudge;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Named Entity Recognizer Wrapper
@@ -18,19 +18,32 @@ public class NERWrapper {
     private final AbstractSequenceClassifier<CoreLabel> classifier;
     private final static String searchTag = "LOCATION";
 
-    public NERWrapper (AbstractSequenceClassifier<CoreLabel> serializedClassifier)  {
+    public NERWrapper(AbstractSequenceClassifier<CoreLabel> serializedClassifier)  {
         classifier = serializedClassifier;
     }
 
-    public List<LocationPair> classifyBook(String pathToBook) {
-        final List<List<CoreLabel>> taggedText = classifier.classify(pathToBook);
+    public List<LocationPair> classifyBook(String book) {
+        final List<List<CoreLabel>> taggedText = classifier.classify(book);
         final Map<String, Set<String>> locationMap = new HashMap<>();
-        final List<LocationPair> locationList = new ArrayList<>();
 
         taggedText.forEach(sentence -> handleLocation(sentence, locationMap));
-        // TODO: rewrite
-        locationMap.entrySet().forEach(item -> locationList.add(new LocationPair(item.getKey(), item.getValue())));
-        return locationList;
+
+        return locationMap.entrySet().stream()
+                .map(NERWrapper::convert)
+                .collect(Collectors.toList());
+    }
+
+    private static LocationPair convert(Map.Entry<String, Set<String>> entry ) {
+        return new LocationPair(entry.getKey(), entry.getValue());
+    }
+
+    // Maybe
+    public void classifySentence(List<CoreLabel> sentence, String line) {
+        final List<CoreLabel> taggedText = classifier.classifySentence(sentence);
+        List<Triple<String,Integer,Integer>> test = classifier.classifyToCharacterOffsets(line);
+        if (!test.isEmpty()) {
+            System.out.println(test);
+        }
     }
 
     /**
@@ -61,29 +74,14 @@ public class NERWrapper {
                     }
                 }
 
-                String sentenceLine = Sentence.listToOriginalTextString(sentence);
+                String sentenceLine = Sentence
+                        .listToOriginalTextString(sentence)
+                        .replaceAll("\\s+(?=[),.!?;:'])", "");
+
                 if (judge.makeDecision(sentenceLine)) {
                     locationMap.putIfAbsent(locationName, new HashSet<>());
                     locationMap.get(locationName).add(sentenceLine);
                 }
-            }
-        }
-    }
-
-    // draft
-    private void logSemantics(List<LocationPair> locations) {
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-
-        SentimentJudge judge = new SentimentJudge(props);
-        for (LocationPair item : locations) {
-            for (String line : item.quotes) {
-                if (judge.makeDecision(line)) {
-                    System.out.print(" OK ");
-                } else {
-                    System.out.print(" NOK ");
-                }
-                System.out.println(line);
             }
         }
     }

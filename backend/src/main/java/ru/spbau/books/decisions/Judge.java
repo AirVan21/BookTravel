@@ -1,4 +1,4 @@
-package ru.spbau.decisions;
+package ru.spbau.books.decisions;
 
 /**
  * Created by airvan21 on 04.04.16.
