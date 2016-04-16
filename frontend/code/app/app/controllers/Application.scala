@@ -8,11 +8,7 @@ import models._
 class Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index())
-  }
-
-  def help = Action {
-    Ok(views.html.help("Help"))
+    Ok(views.html.base(views.html.index()))
   }
 
 }

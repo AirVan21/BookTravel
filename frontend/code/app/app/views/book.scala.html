@@ -1,59 +1,40 @@
 @(titleId: String)
 
-<html lang="en" >
 
-<head>
-  <meta charset="UTF-8">
+<script src="@routes.Assets.versioned("javascripts/book.js")"></script>
 
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
-  
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.css">
-  <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/jquery-jvectormap-2.0.3.css")" type="text/css" media="screen"/>
+<script src="@routes.Assets.versioned("javascripts/jquery-jvectormap-2.0.3.min.js")"></script>
+<script src="http://jvectormap.com/js/jquery-jvectormap-world-mill.js"></script>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-
-  <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/jquery-jvectormap-2.0.3.css")" type="text/css" media="screen"/>
-  <script src="@routes.Assets.versioned("javascripts/jquery-jvectormap-2.0.3.min.js")"></script>
-  <script src="http://jvectormap.com/js/jquery-jvectormap-world-mill.js"></script>
-  
-
-  <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/app.css")">
-  <script src="@routes.Assets.versioned("javascripts/book.js")"></script>
- 
-</head>
-
-<body ng-app="MyApp">
-
-  <md-toolbar layout="row" >
-    <h1>Ultimate Book Search Service</h1>
-  </md-toolbar>
-
-  <div ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@titleId');" layout="row" layout-xs="column">
-    <div flex>
-      <div id="world-map" style="height:400px"></div>
+<div ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@titleId');" layout="row" layout-xs="column">
+  <div flex>
+    <div  style="position: fixed; left: 0%; right: 50%;">
+      <h2> {{ctrl.data.title}} </h2>
+      <div align="right">
+            <h4 ng-repeat="author in ctrl.data.authors">{{author.firstName}} {{author.lastName}}</h4>
+      </div>
     </div>
-    <div flex>
-      <h1> {{ctrl.data.title}} </h1>
-      <md-list>
-        <md-list-item class="md-3-line md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
-          <div id={{cityCtx.city.name}} class="md-list-item-text">
-            <h2> {{cityCtx.city.name}} </h2>
-            <md-list>
-              <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index">
-                <div class="md-list-item-text">
-                  {{quote}}
-                <md-divider ></md-divider>
-              </md-list-item>
-            </md-list>
-            
-          </div>
-          <md-divider ></md-divider>
-        </md-list-item>
-      </md-list>
-    </div>
+    <div id="world-map" class="inbottom" style="right: 50%; max-height: 60%;"></div>
+
   </div>
-</body>
-</html>
+  <div flex>
+    <md-list>
+      <md-list-item class="md-3-line md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
+        <div id={{cityCtx.city.name}} class="md-list-item-text">
+          <h3> <b> {{cityCtx.city.name}} </b> </h3>
+          <md-list>
+            <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index">
+              <div class="md-list-item-text">
+                {{quote}}
+              <md-divider ></md-divider>
+            </md-list-item>
+          </md-list>
+          
+        </div>
+        <md-divider ></md-divider>
+      </md-list-item>
+    </md-list>
+  </div>
+</div>

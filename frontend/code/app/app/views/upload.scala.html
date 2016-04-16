@@ -1,0 +1,12 @@
+
+  <script src="@routes.Assets.versioned("javascripts/upload.js")"></script>
+
+  @helper.form(action = routes.Upload.file, 'enctype -> "multipart/form-data") {
+    
+    <input type="file" name="book">
+    
+    <p>
+        <input type="submit">
+    </p>
+    
+  }

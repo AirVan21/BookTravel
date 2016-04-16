@@ -1,6 +1,5 @@
 package models
 
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -41,6 +40,9 @@ object City {
       "cityName" -> BSONDocument("$regex" -> ("^" + prefix), "$options" -> "i")
     )
 
+    // Logger.debug(s"LOL")
+    // println("LOL")
+
     collection.
     find(query).
     cursor[City]().
@@ -52,11 +54,10 @@ object City {
       "$or" -> (names map { name => BSONDocument("cityName" -> name) })
     )
 
-    collection.
-    find(query).
-    // hint(BSONDocument("cityName" -> 1)).
-    cursor[City]().
-    collect[List](100)
+    collection
+    .find(query)
+    .cursor[City]()
+    .collect[List](100)
   }
 
   // On start
