@@ -17,6 +17,7 @@ public class LocationData {
 
     public LocationData(String keyFromText, List<CoreLabel> sentenceFromText) {
         keyword = keyFromText;
+        // TODO: fix wrong space padding after prepositions
         sentence = Sentence.listToOriginalTextString(sentenceFromText);
         geocodingHelp = null;
     }

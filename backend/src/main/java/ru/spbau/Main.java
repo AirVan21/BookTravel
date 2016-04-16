@@ -1,5 +1,7 @@
 package ru.spbau;
 
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.mongodb.MongoClient;
 import com.opencsv.CSVReader;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
@@ -9,17 +11,35 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import ru.spbau.archiveManager.ArchiveManager;
+import ru.spbau.books.decisions.SentimentJudge;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
+import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
-import ru.spbau.nerWrapper.NERWrapper;
+import ru.spbau.books.nerWrapper.NERWrapper;
+import ru.spbau.books.statistics.BookStatistics;
+import ru.spbau.googleAPI.BookSearcher;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 public class Main {
+
+    public static void statisticsQuery() throws IOException {
+        BookStatistics statistics = new BookStatistics();
+        final String pathToTarget = "./data/csv/sentence_length.csv";
+
+        MongoClient mongo = new MongoClient();
+        Datastore datastore = new Morphia().createDatastore(mongo, "Books");
+        List<BookRecord> query = datastore.find(BookRecord.class).asList();
+
+        for (BookRecord record : query) {
+            if (record.cities != null) {
+                // TODO: fix records with empty cities (no not add them to DB)
+                statistics.addBookStatistics(record);
+            }
+        }
+    }
 
     public static void runCitiesDBCreation() throws FileNotFoundException {
         final String pathToCSV = "./data/csv/world_cities.csv";
@@ -46,12 +66,19 @@ public class Main {
         Datastore datastore = new Morphia().createDatastore(mongoBook, "Books");
 
         AbstractSequenceClassifier<CoreLabel> serializedClassifier = CRFClassifier.getClassifier(pathToSerializedClassifier);
-        NERWrapper locationNER = new NERWrapper(serializedClassifier);
-
-        ArchiveManager.generateBookDataBase(pathToSmallIndex, locationNER, datastore, citiesDatastore);
+        ArchiveManager.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
     }
 
+    public static void runBookSearchTest() throws Exception {
+        JsonFactory factory = new JacksonFactory();
+        final String title = "America's War for Humanity";
+        BookSearcher.queryGoogleBooks(factory, title);
+
+    }
+
+
     public static void main(String[] args) throws Exception {
-        runBooksDBCreation();
+//        runBooksDBCreation();
+        runBookSearchTest();
     }
 }
