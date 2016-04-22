@@ -7,14 +7,14 @@ import com.google.api.services.books.BooksRequestInitializer;
 import com.google.api.services.books.model.Volume;
 import com.google.api.services.books.model.Volumes;
 
-import java.net.URLEncoder;
-
 /**
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
     private static final String googleAPICode = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     private static final String APPLICATION_NAME = "BookTravel";
+
+
 
     public static void queryGoogleBooks(JsonFactory jsonFactory, String query) throws Exception {
         // Set up Books client.
@@ -41,7 +41,6 @@ public class BookSearcher {
         // Output results.
         for (Volume volume : volumes.getItems()) {
             Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-            Volume.SaleInfo saleInfo = volume.getSaleInfo();
             System.out.println("==========");
             // Title.
             System.out.println("Title: " + volumeInfo.getTitle());
@@ -49,6 +48,7 @@ public class BookSearcher {
             System.out.println(volumeInfo.getImageLinks());
             // Author(s).
             java.util.List<String> authors = volumeInfo.getAuthors();
+
             if (authors != null && !authors.isEmpty()) {
                 System.out.print("Author(s): ");
                 for (int i = 0; i < authors.size(); ++i) {

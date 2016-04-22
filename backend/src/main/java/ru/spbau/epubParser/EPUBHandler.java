@@ -21,7 +21,6 @@ public class EPUBHandler {
             Resource res = bookSection.getResource();
             final BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()));
 
-
             String line;
             while ((line = reader.readLine()) != null) {
                 text.append(line);

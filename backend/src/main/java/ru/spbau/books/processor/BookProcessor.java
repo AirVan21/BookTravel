@@ -32,7 +32,7 @@ public class BookProcessor {
 
         final LengthJudge lengthJudge = new LengthJudge();
         final Stream<String> sentences = tokenizeBook(bookText)
-                .filter(lengthJudge::makeDecision);
+                .filter(lengthJudge::shouldAccept);
 
         return sentences
                 .flatMap(sentence -> locationEntityStream(sentence, recognizer.classifySentence(sentence)))

@@ -29,15 +29,15 @@ public class JSONHandler {
         request.connect();
 
         Scanner reader = new Scanner(request.getInputStream());
-        String resultLine = new String();
+        StringBuilder sb = new StringBuilder();
         while (reader.hasNext()) {
-            resultLine += reader.nextLine();
+            sb.append(reader.nextLine());
         }
         reader.close();
 
         Type gsonType = new TypeToken<Map<String, List<String>>>() {}.getType();
 
-        return gson.fromJson(resultLine, gsonType);
+        return gson.fromJson(sb.toString(), gsonType);
     }
 
     public  Map<String, List<String>> readFromPath(String pathToJSON) throws IOException {

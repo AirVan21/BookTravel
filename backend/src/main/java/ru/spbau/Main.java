@@ -12,11 +12,11 @@ import org.mongodb.morphia.Morphia;
 
 import ru.spbau.archiveManager.ArchiveManager;
 import ru.spbau.books.decisions.SentimentJudge;
+import ru.spbau.books.decisions.WatsonSentimentJudge;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
-import ru.spbau.books.nerWrapper.NERWrapper;
 import ru.spbau.books.statistics.BookStatistics;
 import ru.spbau.googleAPI.BookSearcher;
 
@@ -28,17 +28,32 @@ public class Main {
     public static void statisticsQuery() throws IOException {
         BookStatistics statistics = new BookStatistics();
         final String pathToTarget = "./data/csv/sentence_length.csv";
+        final String pathToSentimental = "./data/csv/sentence_sentiment.csv";
 
         MongoClient mongo = new MongoClient();
         Datastore datastore = new Morphia().createDatastore(mongo, "Books");
-        List<BookRecord> query = datastore.find(BookRecord.class).asList();
+        List<BookRecord> query = datastore.find(BookRecord.class).asList().subList(0, 10);
 
         for (BookRecord record : query) {
             if (record.cities != null) {
-                // TODO: fix records with empty cities (no not add them to DB)
                 statistics.addBookStatistics(record);
             }
         }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathToSentimental))) {
+            statistics
+                    .getSentimentScore()
+                    .stream()
+                    .forEach(score -> {
+                        try {
+                            writer.write(score.toString());
+                            writer.write("\n");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        }
+
     }
 
     public static void runCitiesDBCreation() throws FileNotFoundException {
@@ -71,14 +86,22 @@ public class Main {
 
     public static void runBookSearchTest() throws Exception {
         JsonFactory factory = new JacksonFactory();
-        final String title = "America's War for Humanity";
+        final String title = "An Antarctic Mystery";
         BookSearcher.queryGoogleBooks(factory, title);
 
     }
 
+    public static void testWatson() {
+        SentimentJudge sentimentJudge = new WatsonSentimentJudge();
+        System.out.println(sentimentJudge
+                .getSentimentScore("We left London on July 9th, and travelled by Brighton, Dieppe, Rouen, andParis to Orléans."));
+    }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
 //        runBooksDBCreation();
-        runBookSearchTest();
+//        runBookSearchTest();
+//        statisticsQuery();
+        testWatson();
     }
 }

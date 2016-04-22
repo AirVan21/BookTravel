@@ -1,5 +1,6 @@
 package ru.spbau.books.statistics;
 
+import ru.spbau.books.decisions.StanfordSentimentJudge;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.LocationPair;
 
@@ -13,6 +14,8 @@ public class BookStatistics {
     private int numberOfBooks = 0;
     private int numberOfSentences = 0;
     private List<Integer> numberOfCharsInSentences = new ArrayList<>();
+    private List<Integer> sentimentScore           = new ArrayList<>();
+    private final StanfordSentimentJudge judge = new StanfordSentimentJudge();
 
     public BookStatistics() {}
 
@@ -52,5 +55,13 @@ public class BookStatistics {
 
     public void setNumberOfSentences(int numberOfSentences) {
         this.numberOfSentences = numberOfSentences;
+    }
+
+    public List<Integer> getSentimentScore() {
+        return sentimentScore;
+    }
+
+    public void setSentimentScore(List<Integer> sentimentScore) {
+        this.sentimentScore = sentimentScore;
     }
 }

@@ -2,9 +2,6 @@ package ru.spbau.archiveManager;
 
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.process.CoreLabelTokenFactory;
-import edu.stanford.nlp.process.PTBTokenizer;
-import edu.stanford.nlp.process.WordToSentenceProcessor;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
 import ru.spbau.books.processor.BookProcessor;
@@ -15,7 +12,6 @@ import ru.spbau.database.CityRecord;
 import ru.spbau.database.LocationPair;
 import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.locationRecord.LocationValidator;
-import ru.spbau.books.nerWrapper.NERWrapper;
 
 import java.io.*;
 import java.util.*;
@@ -35,6 +31,10 @@ public class ArchiveManager {
                 Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
 
                 if (!bookMetadata.getLanguage().equals("en")) {
+                    continue;
+                }
+
+                if (bookMetadata.getAuthors().size() == 0 || bookMetadata.getAuthors().get(0).getFirstname().equals("")) {
                     continue;
                 }
 
@@ -71,23 +71,16 @@ public class ArchiveManager {
 
     /**
      * Reads and analyses book content.
-     * Validates location keyword via - a) via trained Trie match
-     *                                  b) via Google Geocoding API.
-     * Returns location records.
-     *
      */
     static private List<LocationPair> processBook(String pathToBook, AbstractSequenceClassifier<CoreLabel> classifier,
                                                   LocationValidator validator) throws IOException {
 
         BookProcessor processor = new BookProcessor(classifier);
-        List<LocationPair> locationList = processor.processBook(pathToBook);
-
-
-        locationList = locationList.stream()
+        List<LocationPair> locationList = processor.processBook(pathToBook)
+                .stream()
                 .filter(locationPair -> validator.validateWithDB(locationPair.cityName))
                 .collect(Collectors.toList());
 
         return locationList;
     }
-
 }
