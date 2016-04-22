@@ -10,16 +10,13 @@ public class Quote {
     private final String source;
     private String sentiment = SentimentGrade.NEUTRAL.toString();
 
-    public Quote(String source, SentimentJudge sentimentJudge) {
+    public Quote(String source) {
         this.source = source;
-        this.sentiment = sentimentJudge
-                .getSentimentScore(source)
-                .toString();
     }
 
-    public Quote(String sentiment, String source) {
-        this.sentiment = sentiment;
+    public Quote(String source, String sentiment) {
         this.source = source;
+        this.sentiment = sentiment;
     }
 
     public String getSource() {
@@ -28,5 +25,14 @@ public class Quote {
 
     public String getSentiment() {
         return sentiment;
+    }
+
+    public void modifySentiment(SentimentJudge sentimentJudge) {
+        sentiment = sentimentJudge.getSentimentScore(source).toString();
+    }
+
+    @Override
+    public String toString() {
+        return source;
     }
 }

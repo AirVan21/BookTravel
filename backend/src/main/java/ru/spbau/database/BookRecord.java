@@ -19,11 +19,11 @@ public class BookRecord {
     public String title;
     public String language;
     public List<BookAuthor> authors;
-    public List<LocationPair> cities;
+    public List<LocationEntity> cities;
 
     public BookRecord() {}
 
-    public BookRecord(Metadata metadata, List<LocationPair> locationsFromBook) {
+    public BookRecord(Metadata metadata, List<LocationEntity> locationsFromBook) {
         title = metadata.getFirstTitle();
         authors = convertAuthorsList(metadata.getAuthors());
         language = metadata.getLanguage();
@@ -45,12 +45,12 @@ public class BookRecord {
         System.out.println(language);
 
         System.out.println("-----------------------------------------------------------------");
-        for (LocationPair location : cities) {
+        for (LocationEntity location : cities) {
             System.out.println(authors);
             System.out.println("--------------");
-            System.out.println(location.cityName);
+            System.out.println(location.getCityName());
             System.out.println("--------------");
-            location.quotes.forEach(sentence -> System.out.println(sentence));
+            location.getQuotes().forEach(sentence -> System.out.println(sentence));
         }
 
         System.out.println("================================================================");
