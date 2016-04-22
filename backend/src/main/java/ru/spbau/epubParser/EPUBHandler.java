@@ -18,12 +18,11 @@ public class EPUBHandler {
         final StringBuilder text = new StringBuilder();
 
         for (SpineReference bookSection : spine.getSpineReferences()) {
-            Resource res = bookSection.getResource();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()));
+            final BufferedReader reader = new BufferedReader(bookSection.getResource().getReader());
 
             String line;
             while ((line = reader.readLine()) != null) {
-                text.append(line);
+                text.append(line + " ");
             }
         }
         // Removes HTML tags
