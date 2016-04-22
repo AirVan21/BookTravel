@@ -3,7 +3,6 @@
 
   var dataAccepted = "DATA_ACCEPTED";
 
-  angular.module('MyApp',['ngMaterial', 'ngMessages']);
   angular.module('MyApp').controller('ViewCtrl', ViewCtrl);
 
 

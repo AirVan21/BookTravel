@@ -2,11 +2,13 @@ db:
   image: mongo
   volumes:
     - ./db:/data/db
-    - ./logs:/var/log/mongodb
   command: --profile=1 --slowms=100
 
 web:
   image: nizshee/geobook:0.2
+  volumes:
+    - ./logs:/code/logs
+    - ./uploaded:/code/uploaded
   working_dir: /code
   command: [app-1.0-SNAPSHOT/bin/app, -Dplay.crypto.secret=AosjciSWGnqmEX5ZW6hd8cdCR8Qh]
   ports:

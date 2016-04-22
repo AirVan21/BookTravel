@@ -1,13 +1,15 @@
 (function () {
   'use strict';
-
+  
   // angular.module('MyApp').controller('ResultCtrl', ResultCtrl);
-  angular.module('MyApp').controller('AutocompleteCtrl', AutocompleteCtrl);
+  angular.module('MyApp').controller('FindBookCtrl', FindBookCtrl);
   
   var requestChanged = "requestChanged";
 
-  function AutocompleteCtrl ($timeout, $q, $log, $http, $location) {
+  function FindBookCtrl ($q, $log, $http, $location, $window) {
     var self = this;
+
+    self.host = $location.host() + ":" + $location.port();
 
     self.simulateQuery = false;
     self.isDisabled    = false;
@@ -23,19 +25,18 @@
       var name = $location.hash();
       self.searchText = name;
       self.update(name);
-      // $rootScope.$broadcast(requestChanged, { name: text });
       $log.info(name);
     }
 
     function searchTextChange(text) {
       $log.info('Text changed to ' + text);
+      $location.hash(text)
     }
 
     function selectedItemChange(item) {
       $log.info('Item changed to ' + JSON.stringify(item));
-      var name = item === undefined ? "" : item.name;
-      $location.hash(name);
-      self.update(name);
+      var id = item === undefined ? "search" : item.id;
+      window.location.href = "http://" + self.host + "/book/" + id;
     }
 
     function getHttpResponse(query) {
@@ -45,7 +46,7 @@
 
       $http({
         method : "GET",
-        url : "city/search/" + lowercaseQuery,
+        url : "search/" + lowercaseQuery,
       }).then(function mySucces(r) {
         var response = angular.fromJson(r);
         deferred.resolve(response.data);
@@ -60,35 +61,24 @@
     }
 
     self.update = function(name) {
-      if (name == "") {
-        self.books = []
-        return;
-      }
+      $log.info("here");
+        if (name == "") {
+          self.books = []
+          return;
+        }
 
-      $http({
-        method : "GET",
-        url : "book/searchByCity/" + name,
-      }).then(function mySucces(r) {
-        var response = angular.fromJson(r);
-        self.books = angular.fromJson(response.data);
-        $log.info(response.data);
-      }, function myError(response) {
-        $log.info(response);
-      });
+        $http({
+          method : "GET",
+          url : "book/search/" + name,
+        }).then(function mySucces(r) {
+          var response = angular.fromJson(r);
+          self.books = angular.fromJson(response.data);
+          $log.info(response.data);
+        }, function myError(response) {
+          $log.info(response);
+        });
     }
 
   }
-
-
-  // function ResultCtrl ($http, $log, $rootScope, shared) {
-  //   var self = this;
-
-
-    // $rootScope.$on(requestChanged, function (event, data) {
-    //     self.update(data.name);
-    // });
-
-  //   shared.update = self.update;
-  // }
 
 })();

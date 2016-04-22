@@ -1,12 +1,12 @@
 
 
-<script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+<script src="@routes.Assets.versioned("javascripts/findBook.js")"></script>
 
-<div ng-controller="AutocompleteCtrl as ctrl" ng-init= "ctrl.reload()">
+<div ng-controller="FindBookCtrl as ctrl" ng-init= "ctrl.reload()">
   <md-content class="md-padding">
     <form ng-submit="$event.preventDefault()">
-        <!--   md-autofocus="true" -->
       <md-autocomplete
+          md-autofocus="true"
           ng-disabled="ctrl.isDisabled"
           md-no-cache="ctrl.noCache"
           md-selected-item="ctrl.selectedItem"
@@ -14,22 +14,27 @@
           md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
           md-selected-item-change="ctrl.selectedItemChange(item)"
           md-items="item in ctrl.querySearch(ctrl.searchText)"
-          md-item-text="item.name"
+          md-item-text="item.title"
           md-min-length="1"
-          placeholder="What city do you need?">
+          placeholder="What book or author do you need?"
+          md-menu-class="autocomplete-custom-template">
         <md-item-template>
-          <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.name}}</span>
+          <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">
+            {{item.title}}
+          </span>
+<!--           <span ng-repeat="author in item.authors">
+            <h4>{{author.firstName}} {{author.lastName}}</h4>
+          </span> -->
         </md-item-template>
         <md-not-found>
-          No cities matching "{{ctrl.searchText}}" were found.
+          No books matching "{{ctrl.searchText}}" were found.
         </md-not-found>
       </md-autocomplete>
       <br/>
     </form>
   </md-content>
 
-  
-  <md-list>
+  <!-- <md-list>
     <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.books" ng-href="book/{{book.id}}">
       <div class="md-list-item-text">
         <h3> {{book.title}} </h3>
@@ -42,5 +47,5 @@
       </div>
       <md-divider ></md-divider>
     </md-list-item>
-  </md-list>
+  </md-list> -->
 </div>
