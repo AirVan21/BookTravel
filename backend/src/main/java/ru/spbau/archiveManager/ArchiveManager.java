@@ -4,12 +4,11 @@ import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
+import ru.spbau.books.decisions.SentimentJudge;
+import ru.spbau.books.decisions.WatsonSentimentJudge;
 import ru.spbau.books.processor.BookProcessor;
 import ru.spbau.csvHandler.CityEntry;
-import ru.spbau.database.BookRecord;
-import ru.spbau.database.CityCoordinates;
-import ru.spbau.database.CityRecord;
-import ru.spbau.database.LocationPair;
+import ru.spbau.database.*;
 import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.locationRecord.LocationValidator;
 
@@ -38,11 +37,11 @@ public class ArchiveManager {
                     continue;
                 }
 
-                List<LocationPair> locationList = processBook(pathToBook, classifier, validator);
+                List<LocationEntity> locationList = processBook(pathToBook, classifier, validator);
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
                     bookRecord.consoleLog();
-//                    ds.save(bookRecord);
+                    ds.save(bookRecord);
                 }
             }
         } catch (IOException e) {
@@ -72,14 +71,22 @@ public class ArchiveManager {
     /**
      * Reads and analyses book content.
      */
-    static private List<LocationPair> processBook(String pathToBook, AbstractSequenceClassifier<CoreLabel> classifier,
+    static private List<LocationEntity> processBook(String pathToBook, AbstractSequenceClassifier<CoreLabel> classifier,
                                                   LocationValidator validator) throws IOException {
 
         BookProcessor processor = new BookProcessor(classifier);
-        List<LocationPair> locationList = processor.processBook(pathToBook)
+        List<LocationEntity> locationList = processor.processBook(pathToBook)
                 .stream()
-                .filter(locationPair -> validator.validateWithDB(locationPair.cityName))
+                .filter(location -> validator.validateWithDB(location.getCityName()))
                 .collect(Collectors.toList());
+
+        // Run sentiment analysis on sentences
+        final SentimentJudge judge = new WatsonSentimentJudge();
+        locationList
+                .forEach(location -> location
+                        .getQuotes()
+                        .stream()
+                        .forEach(quote -> quote.modifySentiment(judge)));
 
         return locationList;
     }
