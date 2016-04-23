@@ -1,8 +1,13 @@
 package ru.spbau.database;
 
+import com.google.maps.model.AddressComponent;
+import com.google.maps.model.GeocodingResult;
+
 public class CityCoordinates {
-    private String country;
-    private String province;
+    private final static String provinceId = "ADMINISTRATIVE_AREA_LEVEL_1";
+    private final static String countryId  = "POLITICAL";
+    private String country  = "";
+    private String province = "";
     private double lat;
     private double lng;
 
@@ -13,6 +18,14 @@ public class CityCoordinates {
         this.province = province;
         this.lat = lat;
         this.lng = lng;
+    }
+
+    public CityCoordinates(GeocodingResult location) {
+        lat = location.geometry.location.lat;
+        lng = location.geometry.location.lng;
+
+        // [3].short name -- province // ADMINISTRATIVE_AREA_LEVEL_1
+        // [4].short name -- country  // POLITICAL
     }
 
     public String getCountry() {
@@ -45,5 +58,15 @@ public class CityCoordinates {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    private void setProvinceFromGeocoding(GeocodingResult location) {
+        for (AddressComponent item : location.addressComponents) {
+
+        }
+    }
+
+    private void setCountryFromGeocoding() {
+
     }
 }

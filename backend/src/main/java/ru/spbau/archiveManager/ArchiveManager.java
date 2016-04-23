@@ -5,6 +5,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
 import ru.spbau.books.decisions.SentimentJudge;
+import ru.spbau.books.decisions.StanfordSentimentJudge;
 import ru.spbau.books.decisions.WatsonSentimentJudge;
 import ru.spbau.books.processor.BookProcessor;
 import ru.spbau.csvHandler.CityEntry;
@@ -81,7 +82,7 @@ public class ArchiveManager {
                 .collect(Collectors.toList());
 
         // Run sentiment analysis on sentences
-        final SentimentJudge judge = new WatsonSentimentJudge();
+        final SentimentJudge judge = new StanfordSentimentJudge();
         locationList
                 .forEach(location -> location
                         .getQuotes()

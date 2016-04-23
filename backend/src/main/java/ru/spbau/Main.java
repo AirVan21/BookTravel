@@ -11,14 +11,13 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import ru.spbau.archiveManager.ArchiveManager;
-import ru.spbau.books.decisions.SentimentJudge;
-import ru.spbau.books.decisions.WatsonSentimentJudge;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
 import ru.spbau.books.statistics.BookStatistics;
 import ru.spbau.googleAPI.BookSearcher;
+import ru.spbau.googleAPI.GeoSearcher;
 
 import java.io.*;
 import java.util.List;
@@ -71,7 +70,7 @@ public class Main {
     }
 
     public static void runBooksDBCreation() throws IOException, ClassNotFoundException {
-        final String pathToSmallIndex = "./data/archive/book_index_small.txt";
+        final String pathToSmallIndex = "./data/archive/book_index_top.txt";
         final String pathToSerializedClassifier = "./data/classifiers/english.all.3class.distsim.crf.ser.gz";
 
         MongoClient mongoCity = new MongoClient();
@@ -85,16 +84,13 @@ public class Main {
     }
 
     public static void runBookSearchTest() throws Exception {
-        JsonFactory factory = new JacksonFactory();
-        final String title = "An Antarctic Mystery";
-        BookSearcher.queryGoogleBooks(factory, title);
-
+        final String title = "Jane Eyre";
+        BookSearcher.queryGoogleBooks(title);
     }
 
-    public static void testWatson() {
-        SentimentJudge sentimentJudge = new WatsonSentimentJudge();
-        System.out.println(sentimentJudge
-                .getSentimentScore("We left London on July 9th, and travelled by Brighton, Dieppe, Rouen, andParis to Orléans."));
+    public static void runGeoSearchTest() throws Exception {
+        final String name = "London";
+        GeoSearcher.requestGeoInfo(name);
     }
 
     public static void main(String[] args) throws Exception
@@ -102,6 +98,6 @@ public class Main {
 //        runBooksDBCreation();
 //        runBookSearchTest();
 //        statisticsQuery();
-        testWatson();
+        runGeoSearchTest();
     }
 }

@@ -2,6 +2,7 @@ package ru.spbau.googleAPI;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.books.Books;
 import com.google.api.services.books.BooksRequestInitializer;
 import com.google.api.services.books.model.Volume;
@@ -11,16 +12,15 @@ import com.google.api.services.books.model.Volumes;
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
-    private static final String googleAPICode = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
+    private static final String GOOGLE_API_CODE = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     private static final String APPLICATION_NAME = "BookTravel";
+    private static final JsonFactory jsonFactory = new JacksonFactory();
 
-
-
-    public static void queryGoogleBooks(JsonFactory jsonFactory, String query) throws Exception {
+    public static void queryGoogleBooks(String query) throws Exception {
         // Set up Books client.
         final Books books = new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, null)
                 .setApplicationName(APPLICATION_NAME)
-                .setGoogleClientRequestInitializer(new BooksRequestInitializer(googleAPICode))
+                .setGoogleClientRequestInitializer(new BooksRequestInitializer(GOOGLE_API_CODE))
                 .build();
 
         // Set query string and filter only Google eBooks.

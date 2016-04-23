@@ -1,5 +1,6 @@
 package ru.spbau.database;
 
+import com.google.maps.model.GeocodingResult;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -17,6 +18,9 @@ public class CityRecord {
     private List<CityCoordinates> locations;
 
     public CityRecord() {}
+
+    public CityRecord(GeocodingResult location) {
+    }
 
     public CityRecord(String cityName, List<CityCoordinates> locations) {
         this.cityName = cityName;

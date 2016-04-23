@@ -33,6 +33,6 @@ public class Quote {
 
     @Override
     public String toString() {
-        return source;
+        return source + "\n" + sentiment;
     }
 }

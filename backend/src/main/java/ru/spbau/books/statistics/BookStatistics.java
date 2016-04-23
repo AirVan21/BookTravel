@@ -2,7 +2,7 @@ package ru.spbau.books.statistics;
 
 import ru.spbau.books.decisions.StanfordSentimentJudge;
 import ru.spbau.database.BookRecord;
-import ru.spbau.database.LocationPair;
+import ru.spbau.database.LocationEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,9 @@ public class BookStatistics {
 
     public void addBookStatistics(BookRecord book) {
         numberOfBooks++;
-        for (LocationPair item : book.cities) {
-            numberOfSentences += item.quotes.size();
-            item.quotes.forEach(quote -> numberOfCharsInSentences.add(quote.length()));
+        for (LocationEntity item : book.cities) {
+            numberOfSentences += item.getQuotes().size();
+            item.getQuotes().forEach(quote -> numberOfCharsInSentences.add(quote.getSource().length()));
         }
     }
 
