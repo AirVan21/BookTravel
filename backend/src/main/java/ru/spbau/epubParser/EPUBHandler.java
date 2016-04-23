@@ -22,7 +22,8 @@ public class EPUBHandler {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                text.append(line + " ");
+                text.append(line);
+                text.append(" ");
             }
         }
         // Removes HTML tags

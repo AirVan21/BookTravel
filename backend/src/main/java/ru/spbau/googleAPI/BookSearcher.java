@@ -17,7 +17,6 @@ public class BookSearcher {
     private static final JsonFactory jsonFactory = new JacksonFactory();
 
     public static void queryGoogleBooks(String query) throws Exception {
-        // Set up Books client.
         final Books books = new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, null)
                 .setApplicationName(APPLICATION_NAME)
                 .setGoogleClientRequestInitializer(new BooksRequestInitializer(GOOGLE_API_CODE))
@@ -26,10 +25,7 @@ public class BookSearcher {
         // Set query string and filter only Google eBooks.
         System.out.println("Query: [" + query + "]");
         Books.Volumes.List volumesList = books.volumes().list(query);
-        volumesList.setMaxResults((long) 5);
-        volumesList.setPrintType("books");
-        volumesList.setOrderBy("relevance");
-        volumesList.setFilter("ebooks");
+        setSearchParemeters(volumesList);
 
         // Execute the query.
         Volumes volumes = volumesList.execute();
@@ -74,6 +70,12 @@ public class BookSearcher {
             // Link to Google eBooks.
             System.out.println(volumeInfo.getInfoLink());
         }
-        System.out.println("==========");
+    }
+
+    private static void setSearchParemeters(Books.Volumes.List volumesList) {
+        volumesList.setMaxResults((long) 5);
+        volumesList.setPrintType("books");
+        volumesList.setOrderBy("relevance");
+        volumesList.setFilter("ebooks");
     }
 }

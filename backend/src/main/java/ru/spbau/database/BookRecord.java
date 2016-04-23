@@ -37,7 +37,7 @@ public class BookRecord {
         return authorList;
     }
 
-    // override => toString
+    // TODO: toString
     public void consoleLog() {
         System.out.println("================================================================");
 

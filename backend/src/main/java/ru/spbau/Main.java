@@ -1,7 +1,5 @@
 package ru.spbau;
 
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.mongodb.MongoClient;
 import com.opencsv.CSVReader;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
@@ -10,7 +8,8 @@ import edu.stanford.nlp.ling.CoreLabel;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
-import ru.spbau.archiveManager.ArchiveManager;
+import ru.spbau.archiveManager.BookDatabaseGenerator;
+import ru.spbau.archiveManager.CityDatabaseGenerator;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
@@ -63,7 +62,7 @@ public class Main {
 
         CSVReader reader = new CSVReader(new FileReader(pathToCSV));
         List<CityEntry> entries = CSVHandler.parse(reader);
-        ArchiveManager.generateCityDataBase(entries, datastore);
+        CityDatabaseGenerator.fillDatabase(entries, datastore);
 
         List<CityRecord> query = datastore.find(CityRecord.class).field("cityName").containsIgnoreCase("U.S.").asList();
         System.out.println("SELECT COUNT = " + query.size());
@@ -80,7 +79,7 @@ public class Main {
         Datastore datastore = new Morphia().createDatastore(mongoBook, "Books");
 
         AbstractSequenceClassifier<CoreLabel> serializedClassifier = CRFClassifier.getClassifier(pathToSerializedClassifier);
-        ArchiveManager.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
+        BookDatabaseGenerator.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
     }
 
     public static void runBookSearchTest() throws Exception {
@@ -88,16 +87,11 @@ public class Main {
         BookSearcher.queryGoogleBooks(title);
     }
 
-    public static void runGeoSearchTest() throws Exception {
-        final String name = "London";
-        GeoSearcher.requestGeoInfo(name);
-    }
-
     public static void main(String[] args) throws Exception
     {
-//        runBooksDBCreation();
+        runBooksDBCreation();
 //        runBookSearchTest();
 //        statisticsQuery();
-        runGeoSearchTest();
+//        runGeoSearchTest();
     }
 }

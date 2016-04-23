@@ -3,6 +3,8 @@ package ru.spbau.database;
 import com.google.maps.model.AddressComponent;
 import com.google.maps.model.GeocodingResult;
 
+import java.util.Optional;
+
 public class CityCoordinates {
     private final static String provinceId = "ADMINISTRATIVE_AREA_LEVEL_1";
     private final static String countryId  = "COUNTRY";
@@ -23,8 +25,8 @@ public class CityCoordinates {
     public CityCoordinates(GeocodingResult location) {
         lat = location.geometry.location.lat;
         lng = location.geometry.location.lng;
-        country  = getParameterFromGeocoding(location, countryId);
-        province = getParameterFromGeocoding(location, provinceId);
+        country  = getParameterFromGeocoding(location, countryId).get();
+        province = getParameterFromGeocoding(location, provinceId).get();
     }
 
     public String getCountry() {
@@ -59,14 +61,13 @@ public class CityCoordinates {
         this.lng = lng;
     }
 
-    private String getParameterFromGeocoding(GeocodingResult location, String parameter) {
+    private Optional<String> getParameterFromGeocoding(GeocodingResult location, String parameter) {
         for (AddressComponent item : location.addressComponents) {
             if (item.types.length > 0 && item.types[0].name().equals(parameter)) {
-                return item.longName;
+                return Optional.of(item.longName);
             }
         }
 
-        // Use if smth ! Java8
-        return "";
+        return Optional.of("");
     }
 }

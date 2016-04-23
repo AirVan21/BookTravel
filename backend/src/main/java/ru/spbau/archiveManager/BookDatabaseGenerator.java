@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Created by airvan21 on 23.02.16.
  */
-public class ArchiveManager {
+public class BookDatabaseGenerator {
 
     static public void generateBookDataBase(String pathToIndexFile,  AbstractSequenceClassifier<CoreLabel> classifier,
                                             Datastore ds, Datastore validate) {
@@ -42,30 +42,11 @@ public class ArchiveManager {
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
                     bookRecord.consoleLog();
-                    ds.save(bookRecord);
+//                    ds.save(bookRecord);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    static public void generateCityDataBase(List<CityEntry> entires, Datastore ds) {
-        Map<String, List<CityCoordinates>> storage = new HashMap<>();
-        final double populationThreshold = 10_000;
-
-        for (CityEntry city : entires) {
-            if (city.getPopulation() > populationThreshold) {
-                storage.putIfAbsent(city.getFormattedName(), new ArrayList<>());
-                storage.get(city.getFormattedName()).add(new CityCoordinates(
-                        city.getCountry(), city.getProvince(), city.getLat(), city.getLng()
-                ));
-            }
-        }
-
-        for (Map.Entry<String, List<CityCoordinates>> item : storage.entrySet()) {
-            CityRecord record = new CityRecord(item.getKey(), item.getValue());
-            ds.save(record);
         }
     }
 
