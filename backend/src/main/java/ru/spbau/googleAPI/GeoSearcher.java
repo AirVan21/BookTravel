@@ -24,6 +24,6 @@ public class GeoSearcher {
                 .map(CityCoordinates::new)
                 .collect(Collectors.toList());
 
-        return new CityRecord("", geoInformation);
+        return new CityRecord(location, geoInformation);
     }
 }

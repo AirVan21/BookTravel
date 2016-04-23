@@ -5,7 +5,7 @@ import com.google.maps.model.GeocodingResult;
 
 public class CityCoordinates {
     private final static String provinceId = "ADMINISTRATIVE_AREA_LEVEL_1";
-    private final static String countryId  = "POLITICAL";
+    private final static String countryId  = "COUNTRY";
     private String country  = "";
     private String province = "";
     private double lat;
@@ -23,9 +23,8 @@ public class CityCoordinates {
     public CityCoordinates(GeocodingResult location) {
         lat = location.geometry.location.lat;
         lng = location.geometry.location.lng;
-
-        // [3].short name -- province // ADMINISTRATIVE_AREA_LEVEL_1
-        // [4].short name -- country  // POLITICAL
+        country  = getParameterFromGeocoding(location, countryId);
+        province = getParameterFromGeocoding(location, provinceId);
     }
 
     public String getCountry() {
@@ -60,13 +59,14 @@ public class CityCoordinates {
         this.lng = lng;
     }
 
-    private void setProvinceFromGeocoding(GeocodingResult location) {
+    private String getParameterFromGeocoding(GeocodingResult location, String parameter) {
         for (AddressComponent item : location.addressComponents) {
-
+            if (item.types.length > 0 && item.types[0].name().equals(parameter)) {
+                return item.longName;
+            }
         }
-    }
 
-    private void setCountryFromGeocoding() {
-
+        // Use if smth ! Java8
+        return "";
     }
 }
