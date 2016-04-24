@@ -8,14 +8,36 @@ import ru.spbau.books.decisions.SentimentJudge;
  */
 public class Quote {
     private final String source;
-    private String sentiment = SentimentGrade.NEUTRAL.toString();
+    private final String cityName;
 
-    public Quote(String source) {
+    private int rating = 0;
+
+    private String sentiment = SentimentGrade.NEUTRAL.toString();
+    public Quote(String source, String cityName) {
         this.source = source;
+        this.cityName = cityName;
     }
 
-    public Quote(String source, String sentiment) {
+    public Quote(String source, String cityName, String sentiment, int rating) {
         this.source = source;
+        this.sentiment = sentiment;
+        this.cityName = cityName;
+        this.rating = rating;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public void setSentiment(String sentiment) {
         this.sentiment = sentiment;
     }
 

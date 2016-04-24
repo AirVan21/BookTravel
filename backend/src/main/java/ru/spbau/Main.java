@@ -16,7 +16,6 @@ import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
 import ru.spbau.books.statistics.BookStatistics;
 import ru.spbau.googleAPI.BookSearcher;
-import ru.spbau.googleAPI.GeoSearcher;
 
 import java.io.*;
 import java.util.List;
@@ -55,7 +54,7 @@ public class Main {
     }
 
     public static void runCitiesDBCreation() throws FileNotFoundException {
-        final String pathToCSV = "./data/csv/world_cities.csv";
+        final String pathToCSV = "./data/csv/cities/cities-part1.csv";
 
         MongoClient mongo = new MongoClient();
         Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
@@ -89,7 +88,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
-        runBooksDBCreation();
+        runCitiesDBCreation();
+//        runBooksDBCreation();
 //        runBookSearchTest();
 //        statisticsQuery();
 //        runGeoSearchTest();

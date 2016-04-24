@@ -18,7 +18,7 @@ public class LocationEntity {
         this.cityName = cityName;
         this.quotes = quotes
                 .stream()
-                .map(Quote::new)
+                .map(quote -> new Quote(quote, cityName))
                 .collect(Collectors.toList());
     }
 
