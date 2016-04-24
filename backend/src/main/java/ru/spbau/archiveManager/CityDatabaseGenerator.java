@@ -8,11 +8,22 @@ import ru.spbau.googleAPI.GeoSearcher;
 import java.util.List;
 
 /**
- * Should be tested!
+ * CityDatabaseGenerator - class for generating database records from CityEntries
+ *
+ * - Cities will be filtered according to POPULATION_THRESHOLD agreement
+ * - Cities with duplicating names will be stored in one record
+ * - Information about coordinates will be asked from Google Geocoding API via GeoSearcher class
  */
 public class CityDatabaseGenerator {
     static final double POPULATION_THRESHOLD = 10_000;
 
+    /**
+     * Adds information about cities to MongoDB.
+     * Filtering and coordinates retrieving will be performed.
+     *
+     * @param cityEntries - information about cities from csv file
+     * @param ds          - interface for MongoDB for storing records
+     */
     static public void fillDatabase(List<CityEntry> cityEntries, Datastore ds) {
         cityEntries
                 .stream()

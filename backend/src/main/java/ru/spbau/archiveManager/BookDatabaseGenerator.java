@@ -41,7 +41,7 @@ public class BookDatabaseGenerator {
                 List<LocationEntity> locationList = processBook(pathToBook, classifier, validator);
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
-                    bookRecord.consoleLog();
+                    System.out.println(bookRecord);
 //                    ds.save(bookRecord);
                 }
             }

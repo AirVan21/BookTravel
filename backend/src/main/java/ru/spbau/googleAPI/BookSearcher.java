@@ -12,11 +12,13 @@ import com.google.api.services.books.model.Volumes;
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
-    private static final String GOOGLE_API_CODE = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
+    private static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     private static final String APPLICATION_NAME = "BookTravel";
+    private static final long MAX_SEARCH_RESULT  = 5;
     private static final JsonFactory jsonFactory = new JacksonFactory();
 
     public static void queryGoogleBooks(String query) throws Exception {
+        // redo with Singleton pattern
         final Books books = new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, null)
                 .setApplicationName(APPLICATION_NAME)
                 .setGoogleClientRequestInitializer(new BooksRequestInitializer(GOOGLE_API_CODE))
@@ -25,7 +27,7 @@ public class BookSearcher {
         // Set query string and filter only Google eBooks.
         System.out.println("Query: [" + query + "]");
         Books.Volumes.List volumesList = books.volumes().list(query);
-        setSearchParemeters(volumesList);
+        setSearchParameters(volumesList);
 
         // Execute the query.
         Volumes volumes = volumesList.execute();
@@ -66,16 +68,12 @@ public class BookSearcher {
                 System.out.print("User Rating: " + volumeInfo.getAverageRating().doubleValue());
                 System.out.println(" (" + volumeInfo.getRatingsCount() + " rating(s))");
             }
-
-            // Link to Google eBooks.
-            System.out.println(volumeInfo.getInfoLink());
         }
     }
 
-    private static void setSearchParemeters(Books.Volumes.List volumesList) {
-        volumesList.setMaxResults((long) 5);
+    private static void setSearchParameters(Books.Volumes.List volumesList) {
+        volumesList.setMaxResults(MAX_SEARCH_RESULT);
         volumesList.setPrintType("books");
         volumesList.setOrderBy("relevance");
-        volumesList.setFilter("ebooks");
     }
 }

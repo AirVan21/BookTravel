@@ -37,23 +37,24 @@ public class BookRecord {
         return authorList;
     }
 
-    // TODO: toString
-    public void consoleLog() {
-        System.out.println("================================================================");
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("================================================================\n");
 
-        System.out.println(title);
-        System.out.println(language);
+        sb.append(title + "\n");
+        sb.append(language + "\n");
 
-        System.out.println("-----------------------------------------------------------------");
+        sb.append("-----------------------------------------------------------------\n");
         for (LocationEntity location : cities) {
-            System.out.println(authors);
-            System.out.println("--------------");
-            System.out.println(location.getCityName());
-            System.out.println("--------------");
-            location.getQuotes().forEach(sentence -> System.out.println(sentence));
+            sb.append(authors + "\n");
+            sb.append("--------------\n");
+            sb.append(location.getCityName() + "\n");
+            sb.append("--------------\n");
+            location.getQuotes().forEach(sentence -> sb.append(sentence + "\n"));
         }
+        sb.append("================================================================\n\n");
 
-        System.out.println("================================================================");
-        System.out.println();
+        return sb.toString();
     }
 }

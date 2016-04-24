@@ -9,10 +9,9 @@ import ru.spbau.books.decisions.SentimentJudge;
 public class Quote {
     private final String source;
     private final String cityName;
-
     private int rating = 0;
-
     private String sentiment = SentimentGrade.NEUTRAL.toString();
+
     public Quote(String source, String cityName) {
         this.source = source;
         this.cityName = cityName;
