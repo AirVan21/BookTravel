@@ -1,32 +1,52 @@
 package ru.spbau.googleAPI;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.books.Books;
 import com.google.api.services.books.BooksRequestInitializer;
 import com.google.api.services.books.model.Volume;
 import com.google.api.services.books.model.Volumes;
+import ru.spbau.database.BookAuthor;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
-    private static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
-    private static final String APPLICATION_NAME = "BookTravel";
+    public static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
+    public static final String APPLICATION_NAME = "BookTravel";
     private static final long MAX_SEARCH_RESULT  = 5;
-    private static final JsonFactory jsonFactory = new JacksonFactory();
+    private final Books bookManager;
 
-    public static void queryGoogleBooks(String query) throws Exception {
-        // redo with Singleton pattern
-        final Books books = new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, null)
-                .setApplicationName(APPLICATION_NAME)
-                .setGoogleClientRequestInitializer(new BooksRequestInitializer(GOOGLE_API_CODE))
-                .build();
+    public BookSearcher (Books bookManager) {
+        this.bookManager = bookManager;
+    }
 
-        // Set query string and filter only Google eBooks.
-        System.out.println("Query: [" + query + "]");
-        Books.Volumes.List volumesList = books.volumes().list(query);
+    public Optional<String> getBookDescription(String title, List<BookAuthor> authors) throws IOException {
+        String query = buildQuery(title, authors);
+        Volumes volumes = executeQuery(query);
+
+        if (volumes.getTotalItems() == 0 || volumes.getItems() == null) {
+            return Optional.empty();
+        }
+
+        for (Volume volume : volumes.getItems()) {
+            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+
+            if (volumeInfo.getDescription() != null) {
+                return Optional.of(volumeInfo.getDescription());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public void queryGoogleBooks(String query) throws Exception {
+        Books.Volumes.List volumesList = bookManager.volumes().list(query);
         setSearchParameters(volumesList);
 
         // Execute the query.
@@ -39,13 +59,11 @@ public class BookSearcher {
         // Output results.
         for (Volume volume : volumes.getItems()) {
             Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-            System.out.println("==========");
-            // Title.
+
+            // Title
             System.out.println("Title: " + volumeInfo.getTitle());
-            // Image link
-            System.out.println(volumeInfo.getImageLinks());
             // Author(s).
-            java.util.List<String> authors = volumeInfo.getAuthors();
+            List<String> authors = volumeInfo.getAuthors();
 
             if (authors != null && !authors.isEmpty()) {
                 System.out.print("Author(s): ");
@@ -71,6 +89,32 @@ public class BookSearcher {
         }
     }
 
+    public static Books generateBooksManager(String applicationName, String apiCode) throws GeneralSecurityException, IOException {
+        return new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), new JacksonFactory(), null)
+                .setApplicationName(applicationName)
+                .setGoogleClientRequestInitializer(new BooksRequestInitializer(apiCode))
+                .build();
+    }
+
+    private Volumes executeQuery(String query) throws IOException {
+        Books.Volumes.List volumesList = bookManager.volumes().list(query);
+        setSearchParameters(volumesList);
+
+        return volumesList.execute();
+    }
+
+    public static String buildQuery(String title, List<BookAuthor> authors) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(title);
+        authors.forEach(bookAuthor -> { sb.append(" "); sb.append(bookAuthor); });
+
+        return sb.toString();
+    }
+
+    /**
+     *
+     * @param volumesList
+     */
     private static void setSearchParameters(Books.Volumes.List volumesList) {
         volumesList.setMaxResults(MAX_SEARCH_RESULT);
         volumesList.setPrintType("books");

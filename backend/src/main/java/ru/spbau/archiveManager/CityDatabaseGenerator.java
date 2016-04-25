@@ -9,17 +9,16 @@ import java.util.List;
 
 /**
  * CityDatabaseGenerator - class for generating database records from CityEntries
- *
- * - Cities will be filtered according to POPULATION_THRESHOLD agreement
- * - Cities with duplicating names will be stored in one record
- * - Information about coordinates will be asked from Google Geocoding API via GeoSearcher class
  */
 public class CityDatabaseGenerator {
     static final double POPULATION_THRESHOLD = 10_000;
 
     /**
      * Adds information about cities to MongoDB.
-     * Filtering and coordinates retrieving will be performed.
+     *
+     * - Cities will be filtered according to POPULATION_THRESHOLD agreement
+     * - Cities with duplicating names will be stored in one record
+     * - Information about coordinates will be asked from Google Geocoding API via GeoSearcher class
      *
      * @param cityEntries - information about cities from csv file
      * @param ds          - interface for MongoDB for storing records
@@ -31,6 +30,7 @@ public class CityDatabaseGenerator {
                 .distinct()
                 .map(CityEntry::getFormattedName)
                 .map(cityName -> new CityRecord(cityName, GeoSearcher.getCityCoordinates(cityName)))
+                .filter(record -> record.getLocations() != null)
                 .forEach(record -> ds.save(record));
     }
 }

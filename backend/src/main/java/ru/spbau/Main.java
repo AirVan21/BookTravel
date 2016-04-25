@@ -19,6 +19,7 @@ import ru.spbau.googleAPI.BookSearcher;
 
 import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -86,9 +87,16 @@ public class Main {
         BookSearcher.queryGoogleBooks(title);
     }
 
+    public static void runCitiesRequest() {
+        MongoClient mongo = new MongoClient();
+        Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
+        List<CityRecord> query = datastore.find(CityRecord.class).asList();
+    }
+
     public static void main(String[] args) throws Exception
     {
-        runCitiesDBCreation();
+        runCitiesRequest();
+//        runCitiesDBCreation();
 //        runBooksDBCreation();
 //        runBookSearchTest();
 //        statisticsQuery();
