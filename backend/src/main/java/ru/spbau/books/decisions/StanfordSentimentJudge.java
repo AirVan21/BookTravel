@@ -4,6 +4,8 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
@@ -23,6 +25,7 @@ public class StanfordSentimentJudge implements SentimentJudge {
     public StanfordSentimentJudge() {
         Properties props = new Properties();
         props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
+//        props.setProperty("annotators", "tokenize, ssplit, pos, parse, sentiment, lemma, depparse, natlog, openie");
         pipeline = new StanfordCoreNLP(props);
     }
 
@@ -39,7 +42,7 @@ public class StanfordSentimentJudge implements SentimentJudge {
     }
 
     /**
-     * Sentiment score grades:
+     * Sentiment score grades according to Stanford spec:
      *  0 - Very Negative
      *  1 - Negative
      *  2 - Neutral
@@ -52,10 +55,26 @@ public class StanfordSentimentJudge implements SentimentJudge {
 
         Annotation annotation = pipeline.process(sentence);
         for (CoreMap quote :  annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
+
+//            System.out.println("Sentence #" + sentence + ": " + quote.get(CoreAnnotations.TextAnnotation.class));
+//            // Print SemanticGraph
+//            System.out.println(quote.get(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class).toString(SemanticGraph.OutputFormat.LIST));
+
             Tree tree = quote.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
             score = RNNCoreAnnotations.getPredictedClass(tree);
         }
 
-        return SentimentGrade.values()[score];
+        SentimentGrade result = SentimentGrade.NEUTRAL;
+
+        // Grouping results with VERY
+        if (score > 2) {
+            result = SentimentGrade.POSITIVE;
+        }
+
+        if (score < 2) {
+            result = SentimentGrade.NEGATIVE;
+        }
+
+        return result;
     }
 }
