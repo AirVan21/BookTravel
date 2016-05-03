@@ -19,16 +19,23 @@ import java.util.Optional;
 public class BookSearcher {
     public static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     public static final String APPLICATION_NAME = "BookTravel";
-    private static final long MAX_SEARCH_RESULT  = 5;
+
+    private static final long MAX_SEARCH_RESULT = 5;
     private final Books bookManager;
 
     public BookSearcher (Books bookManager) {
         this.bookManager = bookManager;
     }
 
-    public Optional<String> getBookDescription(String title, List<BookAuthor> authors) throws IOException {
+    public Optional<String> getBookDescription(String title, List<BookAuthor> authors) {
         String query = buildQuery(title, authors);
-        Volumes volumes = executeQuery(query);
+        Volumes volumes;
+
+        try {
+            volumes = executeQuery(query);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
 
         if (volumes.getTotalItems() == 0 || volumes.getItems() == null) {
             return Optional.empty();

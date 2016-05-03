@@ -15,7 +15,6 @@ import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
 import ru.spbau.books.statistics.BookStatistics;
-import ru.spbau.googleAPI.BookSearcher;
 
 import java.io.*;
 import java.util.List;
@@ -69,8 +68,8 @@ public class Main {
     }
 
     public static void runBooksDBCreation() throws IOException, ClassNotFoundException {
-        final String pathToSmallIndex = "./data/archive/book_index_top.txt";
-        final String pathToSerializedClassifier = "./data/classifiers/english.all.3class.distsim.crf.ser.gz";
+        final String pathToSmallIndex = "./data/archive/book_index_torrent.txt";
+        final String pathToSerializedClassifier = "./data/classifiers/english.muc.7class.distsim.crf.ser.gz";
 
         MongoClient mongoCity = new MongoClient();
         Datastore citiesDatastore = new Morphia().createDatastore(mongoCity, "Cities");
@@ -84,20 +83,31 @@ public class Main {
 
     public static void runBookSearchTest() throws Exception {
         final String title = "Jane Eyre";
-        BookSearcher.queryGoogleBooks(title);
+//        BookSearcher.queryGoogleBooks(title);
     }
 
     public static void runCitiesRequest() {
         MongoClient mongo = new MongoClient();
         Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
-        List<CityRecord> query = datastore.find(CityRecord.class).asList();
+
+        List<CityRecord> query = datastore.find(CityRecord.class).asList()
+                .stream()
+                .filter(item -> item.getLocations() == null)
+                .collect(Collectors.toList());
+
+        List<CityRecord> london = datastore
+                .find(CityRecord.class)
+                .field("cityName")
+                .containsIgnoreCase("London")
+                .asList();
+
     }
 
     public static void main(String[] args) throws Exception
     {
-        runCitiesRequest();
+//        runCitiesRequest();
 //        runCitiesDBCreation();
-//        runBooksDBCreation();
+        runBooksDBCreation();
 //        runBookSearchTest();
 //        statisticsQuery();
 //        runGeoSearchTest();

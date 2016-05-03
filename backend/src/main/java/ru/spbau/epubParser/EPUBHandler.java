@@ -37,5 +37,26 @@ public class EPUBHandler {
         return book.getMetadata();
     }
 
+    /**
+     * Checks EPUBs metadata structure
+     * @param metadata - books meta-info from epublib
+     * @return true    - approves book
+     *         false   - rejects book
+     */
+    public static boolean isEPUBValid(Metadata metadata) {
+        if (metadata.getFirstTitle().equals("")) {
+            return  false;
+        }
 
+        if (metadata.getAuthors().size() == 0) {
+            return false;
+        }
+
+        if (metadata.getAuthors().get(0).getFirstname().equals("") &&
+                metadata.getAuthors().get(0).getLastname().equals("")) {
+            return false;
+        }
+
+        return true;
+    }
 }

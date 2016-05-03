@@ -1,12 +1,19 @@
 package ru.spbau.database;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
 import ru.spbau.books.decisions.SentimentGrade;
 import ru.spbau.books.decisions.SentimentJudge;
 
 /**
  * Created by airvan21 on 22.04.16.
  */
+@Entity
 public class Quote {
+    @Id
+    private ObjectId id;
     private final String source;
     private final String cityName;
     private int rating = 0;

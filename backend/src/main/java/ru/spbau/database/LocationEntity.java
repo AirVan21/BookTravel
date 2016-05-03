@@ -1,8 +1,11 @@
 package ru.spbau.database;
 
+
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.annotations.Reference;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -10,6 +13,7 @@ import java.util.stream.Collectors;
  */
 public class LocationEntity {
     private String cityName;
+    @Reference
     private List<Quote> quotes = new ArrayList<>();
 
     public LocationEntity() {}
@@ -36,5 +40,10 @@ public class LocationEntity {
 
     public void setQuotes(List<Quote> quotes) {
         this.quotes = quotes;
+    }
+
+    public void saveQuotesInDatabese(Datastore ds) {
+        quotes
+                .forEach(item -> ds.save(item));
     }
 }
