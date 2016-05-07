@@ -44,6 +44,10 @@ public class EPUBHandler {
      *         false   - rejects book
      */
     public static boolean isEPUBValid(Metadata metadata) {
+        if (!metadata.getLanguage().equals("en")) {
+            return false;
+        }
+
         if (metadata.getFirstTitle().equals("")) {
             return  false;
         }
@@ -52,7 +56,7 @@ public class EPUBHandler {
             return false;
         }
 
-        if (metadata.getAuthors().get(0).getFirstname().equals("") &&
+        if (metadata.getAuthors().get(0).getFirstname().equals("") ||
                 metadata.getAuthors().get(0).getLastname().equals("")) {
             return false;
         }

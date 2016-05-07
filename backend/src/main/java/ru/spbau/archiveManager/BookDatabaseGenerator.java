@@ -3,8 +3,11 @@ package ru.spbau.archiveManager;
 import com.google.api.services.books.Books;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
+import ru.spbau.books.annotator.RelationExtractor;
+import ru.spbau.books.annotator.SentenceAnnotator;
 import ru.spbau.books.decisions.SentimentJudge;
 import ru.spbau.books.decisions.StanfordSentimentJudge;
 import ru.spbau.books.processor.BookProcessor;
@@ -52,9 +55,8 @@ public class BookDatabaseGenerator {
 
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
-                    if (bookRecord.description.isEmpty()) {
-                        bookRecord.setDescriptionFromBooksAPI(bookManager);
-                    }
+                    bookRecord.setDescriptionFromBooksAPI(bookManager);
+
                     System.out.println(bookRecord);
                     bookRecord.saveInDatabase(ds);
                 }
@@ -76,11 +78,17 @@ public class BookDatabaseGenerator {
 
         // Run sentiment analysis on sentences
         final SentimentJudge judge = new StanfordSentimentJudge();
+        final SentenceAnnotator annotator = new SentenceAnnotator();
+
         locationList
                 .forEach(location -> location
-                        .getQuotes()
-                        .stream()
-                        .forEach(quote -> quote.modifySentiment(judge)));
+                .getQuotes()
+                .stream()
+                .forEach(quote -> {
+                    final Annotation annotation = annotator.annotate(quote.getSource());
+                    quote.modifySentiment(annotation);
+                    quote.modifyIsNotable(annotation);
+                }));
 
         return locationList;
     }

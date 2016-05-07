@@ -1,11 +1,14 @@
 package ru.spbau.database;
 
+import edu.stanford.nlp.pipeline.Annotation;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
+import ru.spbau.books.annotator.RelationExtractor;
 import ru.spbau.books.decisions.SentimentGrade;
 import ru.spbau.books.decisions.SentimentJudge;
+import ru.spbau.books.decisions.StanfordSentimentJudge;
+
 
 /**
  * Created by airvan21 on 22.04.16.
@@ -16,6 +19,7 @@ public class Quote {
     private ObjectId id;
     private final String source;
     private final String cityName;
+    private boolean isNotable = false;
     private int rating = 0;
     private String sentiment = SentimentGrade.NEUTRAL.toString();
 
@@ -55,8 +59,24 @@ public class Quote {
         return sentiment;
     }
 
+    public boolean isNotable() {
+        return isNotable;
+    }
+
+    public void setIsNotable(boolean isNotable) {
+        this.isNotable = isNotable;
+    }
+
     public void modifySentiment(SentimentJudge sentimentJudge) {
         sentiment = sentimentJudge.getSentimentScore(source).toString();
+    }
+
+    public void modifySentiment(Annotation annotation) {
+        sentiment = StanfordSentimentJudge.getSentimentScore(annotation).toString();
+    }
+
+    public void modifyIsNotable(Annotation annotation) {
+        isNotable = RelationExtractor.extractMainRelations(annotation).contains(cityName);
     }
 
     @Override

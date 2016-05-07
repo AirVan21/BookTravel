@@ -110,7 +110,7 @@ public class BookSearcher {
         return volumesList.execute();
     }
 
-    public static String buildQuery(String title, List<BookAuthor> authors) {
+    private static String buildQuery(String title, List<BookAuthor> authors) {
         StringBuilder sb = new StringBuilder();
         sb.append(title);
         authors.forEach(bookAuthor -> { sb.append(" "); sb.append(bookAuthor); });

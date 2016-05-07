@@ -4,8 +4,6 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
@@ -22,10 +20,12 @@ public class StanfordSentimentJudge implements SentimentJudge {
         pipeline = new StanfordCoreNLP(properties);
     }
 
+    /**
+     * TODO: Rewrite via Sentence Annotator
+     */
     public StanfordSentimentJudge() {
         Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
-//        props.setProperty("annotators", "tokenize, ssplit, pos, parse, sentiment, lemma, depparse, natlog, openie");
+        props.setProperty("annotators", "tokenize, ssplit, pos, parse, sentiment, lemma, natlog, openie");
         pipeline = new StanfordCoreNLP(props);
     }
 
@@ -42,12 +42,17 @@ public class StanfordSentimentJudge implements SentimentJudge {
     }
 
     /**
+     * Generates sentiment score processing string sentence
+     *
      * Sentiment score grades according to Stanford spec:
      *  0 - Very Negative
      *  1 - Negative
      *  2 - Neutral
      *  3 - Positive
      *  4 - Very Positive
+     *
+     * @param sentence - sentence from text with Location
+     * @return sentiment score
      */
     @Override
     public SentimentGrade getSentimentScore(String sentence) {
@@ -55,11 +60,33 @@ public class StanfordSentimentJudge implements SentimentJudge {
 
         Annotation annotation = pipeline.process(sentence);
         for (CoreMap quote :  annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
+            Tree tree = quote.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
+            score = RNNCoreAnnotations.getPredictedClass(tree);
+        }
 
-//            System.out.println("Sentence #" + sentence + ": " + quote.get(CoreAnnotations.TextAnnotation.class));
-//            // Print SemanticGraph
-//            System.out.println(quote.get(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class).toString(SemanticGraph.OutputFormat.LIST));
+        SentimentGrade result = SentimentGrade.NEUTRAL;
 
+        // Grouping results with VERY
+        if (score > 2) {
+            result = SentimentGrade.POSITIVE;
+        }
+
+        if (score < 2) {
+            result = SentimentGrade.NEGATIVE;
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves sentiment score from annotation param
+     * @param annotation - information about processed sentence
+     * @return sentiment score
+     */
+    public static SentimentGrade getSentimentScore(Annotation annotation) {
+        int score = 0;
+
+        for (CoreMap quote :  annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             Tree tree = quote.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
             score = RNNCoreAnnotations.getPredictedClass(tree);
         }

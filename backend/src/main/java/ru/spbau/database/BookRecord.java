@@ -23,7 +23,7 @@ public class BookRecord {
     public ObjectId bookID;
     public String title;
     public String language;
-    public String description;
+    public String description = "";
     public List<BookAuthor> authors;
     public List<LocationEntity> cities;
 
@@ -34,7 +34,6 @@ public class BookRecord {
         language = metadata.getLanguage();
         authors = convertAuthorsList(metadata.getAuthors());
         cities = locationsFromBook;
-        setDescriptionFromMetadata(metadata);
     }
 
     public void saveInDatabase(Datastore ds) {

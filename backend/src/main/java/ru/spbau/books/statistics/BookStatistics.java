@@ -15,7 +15,7 @@ public class BookStatistics {
     private int numberOfSentences = 0;
     private List<Integer> numberOfCharsInSentences = new ArrayList<>();
     private List<Integer> sentimentScore           = new ArrayList<>();
-    private final StanfordSentimentJudge judge = new StanfordSentimentJudge();
+    private final StanfordSentimentJudge judge     = new StanfordSentimentJudge();
 
     public BookStatistics() {}
 
