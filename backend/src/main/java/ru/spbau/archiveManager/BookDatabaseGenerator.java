@@ -1,15 +1,13 @@
 package ru.spbau.archiveManager;
 
 import com.google.api.services.books.Books;
+import com.google.api.services.books.model.Volumes;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import nl.siegmann.epublib.domain.Metadata;
 import org.mongodb.morphia.Datastore;
-import ru.spbau.books.annotator.RelationExtractor;
 import ru.spbau.books.annotator.SentenceAnnotator;
-import ru.spbau.books.decisions.SentimentJudge;
-import ru.spbau.books.decisions.StanfordSentimentJudge;
 import ru.spbau.books.processor.BookProcessor;
 import ru.spbau.database.*;
 import ru.spbau.epubParser.EPUBHandler;
@@ -31,7 +29,8 @@ public class BookDatabaseGenerator {
     static public void generateBookDataBase(String pathToIndexFile,  AbstractSequenceClassifier<CoreLabel> classifier,
                                             Datastore ds, Datastore validate) {
         try {
-            List<String> pathsToBooks = Files.lines(Paths.get(pathToIndexFile))
+            List<String> pathsToBooks = Files
+                    .lines(Paths.get(pathToIndexFile))
                     .collect(Collectors.toList());
 
             LocationValidator validator = new LocationValidator(validate);
@@ -45,6 +44,8 @@ public class BookDatabaseGenerator {
                 System.out.println("Book Searcher creation went wrong!");
             }
 
+            BookSearcher bookSearcher = new BookSearcher(bookManager);
+
             for (String pathToBook : pathsToBooks) {
                 Metadata bookMetadata = EPUBHandler.readBookMetadataFromPath(pathToBook);
                 if (!EPUBHandler.isEPUBValid(bookMetadata)) {
@@ -55,10 +56,18 @@ public class BookDatabaseGenerator {
 
                 if (!locationList.isEmpty()) {
                     BookRecord bookRecord = new BookRecord(bookMetadata, locationList);
-                    bookRecord.setDescriptionFromBooksAPI(bookManager);
+                    // TODO: move upper in a code block + rewrite on a metadata parameter
+                    Optional<Volumes> dataFromGoogleBooks = bookSearcher.performQuery(bookRecord.getTitle(), bookRecord.getAuthors());
 
-                    System.out.println(bookRecord);
-                    bookRecord.saveInDatabase(ds);
+                    if (!dataFromGoogleBooks.isPresent()) {
+                        continue;
+                    }
+
+                    if (bookRecord.setDescriptionFromBooksAPI(dataFromGoogleBooks.get()) &&
+                            bookRecord.setCoverLinkFromBooksAPI(dataFromGoogleBooks.get())) {
+                        System.out.println(bookRecord);
+//                        bookRecord.saveInDatabase(ds);
+                    }
                 }
             }
         } catch (IOException e1) {}
@@ -76,8 +85,6 @@ public class BookDatabaseGenerator {
                 .filter(location -> validator.validateWithDB(location.getCityName()))
                 .collect(Collectors.toList());
 
-        // Run sentiment analysis on sentences
-        final SentimentJudge judge = new StanfordSentimentJudge();
         final SentenceAnnotator annotator = new SentenceAnnotator();
 
         locationList

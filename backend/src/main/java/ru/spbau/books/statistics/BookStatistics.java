@@ -27,7 +27,7 @@ public class BookStatistics {
 
     public void addBookStatistics(BookRecord book) {
         numberOfBooks++;
-        for (LocationEntity item : book.cities) {
+        for (LocationEntity item : book.getCities()) {
             numberOfSentences += item.getQuotes().size();
             item.getQuotes().forEach(quote -> numberOfCharsInSentences.add(quote.getSource().length()));
         }

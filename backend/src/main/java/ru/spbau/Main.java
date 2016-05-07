@@ -8,6 +8,9 @@ import edu.stanford.nlp.ling.CoreLabel;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
+import org.mongodb.morphia.aggregation.Accumulator;
+import org.mongodb.morphia.aggregation.Group;
+import org.mongodb.morphia.aggregation.Sort;
 import ru.spbau.archiveManager.BookDatabaseGenerator;
 import ru.spbau.archiveManager.CityDatabaseGenerator;
 import ru.spbau.csvHandler.CSVHandler;
@@ -32,7 +35,7 @@ public class Main {
         List<BookRecord> query = datastore.find(BookRecord.class).asList().subList(0, 10);
 
         for (BookRecord record : query) {
-            if (record.cities != null) {
+            if (record.getCities() != null) {
                 statistics.addBookStatistics(record);
             }
         }
@@ -94,11 +97,14 @@ public class Main {
 //                .filter(item -> item.getLocations() == null)
 //                .collect(Collectors.toList());
 
-        List<CityRecord> london = datastore
-                .find(CityRecord.class)
-                .field("cityName")
-                .containsIgnoreCase("Naples")
-                .asList();
+//        List<CityRecord> req = datastore
+//                .find(CityRecord.class)
+//                .field("cityName")
+//                .containsIgnoreCase("Salt Lake City")
+//                .asList();
+//
+//        datastore.delete(req.get(0));
+
 
     }
 

@@ -10,6 +10,7 @@ import ru.spbau.database.BookAuthor;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,6 @@ import java.util.Optional;
 public class BookSearcher {
     public static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
     public static final String APPLICATION_NAME = "BookTravel";
-
     private static final long MAX_SEARCH_RESULT = 5;
     private final Books bookManager;
 
@@ -27,9 +27,9 @@ public class BookSearcher {
         this.bookManager = bookManager;
     }
 
-    public Optional<String> getBookDescription(String title, List<BookAuthor> authors) {
+    public Optional<Volumes> performQuery(String title, List<BookAuthor> authors) {
         String query = buildQuery(title, authors);
-        Volumes volumes;
+        Volumes volumes = null;
 
         try {
             volumes = executeQuery(query);
@@ -41,11 +41,27 @@ public class BookSearcher {
             return Optional.empty();
         }
 
+        return Optional.of(volumes);
+    }
+
+    public static Optional<String> getBookDescription(Volumes volumes) {
         for (Volume volume : volumes.getItems()) {
             Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
 
             if (volumeInfo.getDescription() != null) {
                 return Optional.of(volumeInfo.getDescription());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<String> getBookCoverLink(Volumes volumes) {
+        for (Volume volume : volumes.getItems()) {
+            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+            Volume.VolumeInfo.ImageLinks links = volumeInfo.getImageLinks();
+            if (links != null && links.getSmallThumbnail() != null) {
+                return Optional.of(links.getSmallThumbnail());
             }
         }
 

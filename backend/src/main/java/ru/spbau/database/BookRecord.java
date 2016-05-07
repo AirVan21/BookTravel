@@ -1,6 +1,6 @@
 package ru.spbau.database;
 
-import com.google.api.services.books.Books;
+import com.google.api.services.books.model.Volumes;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Metadata;
 
@@ -8,7 +8,6 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.bson.types.ObjectId;
-import ru.spbau.epubParser.EPUBHandler;
 import ru.spbau.googleAPI.BookSearcher;
 
 import java.util.*;
@@ -20,12 +19,13 @@ import java.util.stream.Collectors;
 @Entity("Book")
 public class BookRecord {
     @Id
-    public ObjectId bookID;
-    public String title;
-    public String language;
-    public String description = "";
-    public List<BookAuthor> authors;
-    public List<LocationEntity> cities;
+    private ObjectId bookID;
+    private String title;
+    private String language;
+    private String description = "";
+    private String coverLink   = "";
+    private List<BookAuthor> authors;
+    private List<LocationEntity> cities;
 
     public BookRecord() {}
 
@@ -42,12 +42,22 @@ public class BookRecord {
         ds.save(this);
     }
 
-    public void setDescriptionFromBooksAPI(Books bookManager) {
-        BookSearcher bookSearcher = new BookSearcher(bookManager);
-        Optional<String> result = bookSearcher.getBookDescription(title, authors);
+    public boolean setDescriptionFromBooksAPI(Volumes volumes) {
+        Optional<String> result = BookSearcher.getBookDescription(volumes);
         if (result.isPresent()) {
             description = result.get();
         }
+
+        return result.isPresent();
+    }
+
+    public boolean setCoverLinkFromBooksAPI(Volumes volumes) {
+        Optional<String> result = BookSearcher.getBookCoverLink(volumes);
+        if (result.isPresent()) {
+            coverLink = result.get();
+        }
+
+        return result.isPresent();
     }
 
     @Override
@@ -57,6 +67,7 @@ public class BookRecord {
 
         sb.append(title + "\n");
         sb.append(language + "\n");
+        sb.append(coverLink + "\n");
 
         sb.append("-----------------------------------------------------------------\n");
         for (LocationEntity location : cities) {
@@ -69,6 +80,54 @@ public class BookRecord {
         sb.append("================================================================\n\n");
 
         return sb.toString();
+    }
+
+    public List<LocationEntity> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<LocationEntity> cities) {
+        this.cities = cities;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<BookAuthor> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<BookAuthor> authors) {
+        this.authors = authors;
+    }
+
+    public String getCoverLink() {
+        return coverLink;
+    }
+
+    public void setCoverLink(String coverLink) {
+        this.coverLink = coverLink;
     }
 
     private void setDescriptionFromMetadata(Metadata metadata) {
