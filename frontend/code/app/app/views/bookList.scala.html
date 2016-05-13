@@ -2,19 +2,33 @@
 
 <script src="@routes.Assets.versioned("javascripts/bookList.js")"></script>
 
+
 <div flex ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@pageNum');">
+  <center>
+    <span ng-repeat="n in [] | range:ctrl.count">
+      <span ng-click="gctrl.gotoListPage($index + 1)" style="color: blue; cursor: pointer;">{{$index + 1}}</span>
+      <span>{{$last ? '' : ', '}}</span>
+    </spa>
+  </center>
+
   <md-list>
-    <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.data" ng-href="http://{{ctrl.host}}/book/{{book.id}}">
+    <md-list-item class="md-2-line" ng-repeat="book in ctrl.data" ng-click="gctrl.gotoBook(book.id)">
       <div class="md-list-item-text">
         <h3> {{book.title}} </h3>
-        <div ng-repeat="author in book.authors" align="right">
-          <h4>{{author.firstName}} {{author.lastName}}</h4>
-        </div>
-        <div ng-repeat="quote in book.quotes">
-          <p> {{quote}} </p>
-        </div>
+        <h4>
+          <span ng-repeat="author in book.authors">
+            {{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}
+          </span>
+        </h4>
       </div>
       <md-divider ></md-divider>
     </md-list-item>
   </md-list>
+  
+  <center>
+    <span ng-repeat="n in [] | range:ctrl.count">
+      <span ng-click="gctrl.gotoListPage($index + 1)" style="color: blue; cursor: pointer;">{{$index + 1}}</span>
+      <span>{{$last ? '' : ', '}}</span>
+    </spa>
+  </center>
 </div>

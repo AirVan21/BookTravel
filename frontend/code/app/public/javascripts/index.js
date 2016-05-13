@@ -9,6 +9,8 @@
   function AutocompleteCtrl ($timeout, $q, $log, $http, $location) {
     var self = this;
 
+    self.topCities = ["New York", "London", "Paris", "Rome", "Boston", "Detroit", "Edinburgh", "Moscow"];
+
     self.simulateQuery = false;
     self.isDisabled    = false;
 

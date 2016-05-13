@@ -17,10 +17,13 @@ case class Book(
     _id: BSONObjectID
   , title: String
   , authors: Option[List[Author]]
-  , cities: List[Quotes]) {
+  , cities: List[Quotes]
+  , description: String) {
 
   def getCityNames = cities map { _.cityName }
-
+  def getQuoteIds = cities.map(quotes => quotes.getQuoteIds).flatten
+  def getQuoteByCityName(cityName: String) = cities.find(quotes => quotes.cityName == cityName)
+    .map(q => q.quotes.take(3).map(_.id))
 }
 
 object Book {
@@ -30,28 +33,22 @@ object Book {
   val CITIES = "cities"
   val AUTHORS = "authors"
   val QUOTES = "quotes"
+  val DESCRIPTION = "description"
 
   implicit val reader: BSONDocumentReader[Book] = Macros.reader[Book]
 
-  def getWrites(cityMap: Map[String, City]) = new Writes[Book] {
-    implicit val quotesWrite = Quotes.getWrites(cityMap)
+  def getWrites(cityMap: Map[String, City])(quoteMap: Map[BSONObjectID, Quote]) = new Writes[Book] {
+    implicit val quotesWrite = Quotes.getWrites(cityMap)(quoteMap)
     def writes(book: Book) = Json.obj(
       TITLE -> book.title,
       ID -> book._id.stringify,
       CITIES -> Json.toJson(book.cities),
-      AUTHORS -> Json.toJson(book.authors)
+      AUTHORS -> Json.toJson(book.authors),
+      DESCRIPTION -> Json.toJson(book.description)
     )
   }
 
-  implicit val bookWrites = new Writes[Book] {
-    def writes(book: Book) = Json.obj(
-      TITLE -> book.title,
-      ID -> book._id.stringify,
-      CITIES -> Json.toJson(book.cities)
-    )
-  }
-
-  def getSimpleBookWrites(cityName: String) = new Writes[Book]{
+  def getSimpleBookWrites(cityName: String)(quoteMap: Map[BSONObjectID, Quote]) = new Writes[Book]{
     def writes(book: Book) = Json.obj(
       TITLE -> book.title,
       ID -> book._id.stringify,
@@ -59,11 +56,7 @@ object Book {
       QUOTES -> Json.toJson {
         val quotesOption = book.cities find { _.cityName == cityName}
         quotesOption match {
-          case Some(quotes) => quotes.quotes.head match {
-            case quote => List(quote)
-            case _ => List()
-          }
-          
+          case Some(quotes) => quotes.quotes.take(3).map(x => quoteMap.get(x.id)).flatten
           case _ => List()
         }
         
@@ -79,7 +72,7 @@ object Book {
       )
     )
 
-    println("here")
+    // println("here")
 
     collection
     .find(query)
@@ -111,7 +104,7 @@ object Book {
           "$or" -> BSONArray(
             BSONDocument(
               "title" -> BSONDocument(
-                "$regex" -> ("^" + word),
+                "$regex" -> (/*"^" + */word),
                 "$options" -> "i"
               )
             ),

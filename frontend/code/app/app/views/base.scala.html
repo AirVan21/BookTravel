@@ -5,15 +5,27 @@
 <head>
   <meta charset="UTF-8">
 
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+  
+  <!-- <script src="@routes.Assets.versioned("bower_components/angular/angular.min.js")"></script>
+  <script src="@routes.Assets.versioned("bower_components/angular-animate/angular-animate.min.js")"></script>
+  <script src="@routes.Assets.versioned("bower_components/angular-aria/angular-aria.min.js")"></script>
+  <script src="@routes.Assets.versioned("bower_components/angular-messages/angular-messages.min.js")"></script>
+
+  <link rel="stylesheet" href="@routes.Assets.versioned("bower_components/angular-material/angular-material.min.css")">
+  <script src="@routes.Assets.versioned("bower_components/angular-material/angular-material.min.js")"></script> -->
+
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
   
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.css">
   <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.5/angular-material.min.js"></script>
 
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/app.css")">
  
@@ -23,11 +35,66 @@
   (function () {
   angular.module('MyApp',['ngMaterial', 'ngMessages']);
   angular.module('MyApp').controller('ToolbarCtrl', ToolbarCtrl);
+  angular.module('MyApp').filter('range', function() {
+  return function(input, total) {
+    total = parseInt(total);
 
-  function ToolbarCtrl($log, $location) {
+    for (var i=0; i<total; i++) {
+      input.push(i);
+    }
+
+    return input;
+  };
+});
+
+  function ToolbarCtrl($log, $location, $http) {
     var self = this;
 
-    self.host = "http://" + $location.host() + ":" + $location.port();
+    self.host = $location.protocol() + "://" + $location.host() + ":" + $location.port();
+
+    self.gotoBook = function(bookId) {
+      window.location.href = self.host + "/book/" + bookId;
+    }
+
+    self.gotoListPage = function(listPage) {
+      window.location.href = self.host + "/book/list/" + listPage;
+    }
+
+    self.gotoCity = function(cityName) {
+      window.location.href = self.host + "/city/" + cityName;
+    }
+
+    self.gotoHost = function() {
+      window.location.href = self.host;
+    }
+
+    self.voted = {};
+
+    self.addPositive = function(id, cb) {
+      if (self.voted[id] != 1) {
+        self.voted[id] = 1;
+        $http({
+          method : "POST",
+          url : self.host + "/quote/up/" + id,
+        }).then(function mySucces(r) {
+        }, function myError(response) {
+          self.voted[id] = undefined;
+        });
+      }
+    }
+
+    self.addNegative = function(id, cb) {
+      if (self.voted[id] != 1) {
+        self.voted[id] = 1;
+        $http({
+          method : "POST",
+          url : self.host + "/quote/down/" + id,
+        }).then(function mySucces(r) {
+        }, function myError(response) {
+          self.voted[id] = undefined;
+        });
+      }
+    }
   }
 
 })();
@@ -35,18 +102,18 @@
 </script>
 
 <body ng-app="MyApp">
-  <div layout="column" layout-fill>
+  <div layout="column" layout-fill ng-controller="ToolbarCtrl as gctrl">
     <md-toolbar>
-      <div class="md-toolbar-tools" ng-controller="ToolbarCtrl as ctrl">
-        <span>Ultimate Book Search Service</span>
+      <div class="md-toolbar-tools">
+        <span ng-click="gctrl.gotoHost()">Ultimate Book Search Service</span>
         <span flex></span>
-        <md-button ng-href="{{ctrl.host}}">
+        <md-button ng-href="{{gctrl.host}}">
           find by city
         </md-button>
-        <md-button ng-href="{{ctrl.host}}/book/search">
+        <md-button ng-href="{{gctrl.host}}/book/search">
           find by author
         </md-button>
-        <md-button ng-href="{{ctrl.host}}/book/list">
+        <md-button ng-href="{{gctrl.host}}/book/list">
           list
         </md-button>
       </div>

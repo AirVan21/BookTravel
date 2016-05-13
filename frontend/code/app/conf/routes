@@ -6,13 +6,19 @@
 GET     /                           controllers.Application.index
 
 # API
+
+POST /quote/up/:id       controllers.QuoteCntrl.up(id: String)
+POST /quote/down/:id     controllers.QuoteCntrl.down(id: String)
+
 GET /city/search/:id controllers.CityCntrl.search(id: String)
+GET /city/:id        controllers.CityCntrl.page(id: String)
 
 
 GET /book/search         controllers.BookCntrl.pageSearch()
 GET /book/search/:id     controllers.BookCntrl.searchBook(id: String)
 
 
+GET /book/list/count     controllers.BookCntrl.getBookCount()
 GET /book/list           controllers.BookCntrl.pageListMain()
 GET /book/list/:id       controllers.BookCntrl.pageList(id: Int)
 GET /book/list/get/:id   controllers.BookCntrl.getList(id: Int)

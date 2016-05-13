@@ -1,7 +1,6 @@
 (function () {
   'use strict';
   
-  // angular.module('MyApp').controller('ResultCtrl', ResultCtrl);
   angular.module('MyApp').controller('FindBookCtrl', FindBookCtrl);
   
   var requestChanged = "requestChanged";
@@ -19,13 +18,20 @@
     self.searchTextChange   = searchTextChange;
 
     self.books = []
+    self.input = "";
 
     
     self.reload = function() {
       var name = $location.hash();
-      self.searchText = name;
-      self.update(name);
       $log.info(name);
+      self.input = name;
+      self.update(name);
+    }
+
+    self.onInputChanged = function() {
+      $log.info(self.input);
+      $location.hash(self.input);
+      self.update(self.input); 
     }
 
     function searchTextChange(text) {
@@ -61,22 +67,21 @@
     }
 
     self.update = function(name) {
-      $log.info("here");
-        if (name == "") {
-          self.books = []
-          return;
-        }
+      if (name == "") {
+        self.books = []
+        return;
+      }
 
-        $http({
-          method : "GET",
-          url : "book/search/" + name,
-        }).then(function mySucces(r) {
-          var response = angular.fromJson(r);
-          self.books = angular.fromJson(response.data);
-          $log.info(response.data);
-        }, function myError(response) {
-          $log.info(response);
-        });
+      $http({
+        method : "GET",
+        url : "/book/search/" + name,
+      }).then(function mySucces(r) {
+        var response = angular.fromJson(r);
+        self.books = angular.fromJson(response.data);
+        $log.info(response.data);
+      }, function myError(response) {
+        $log.info(response);
+      });
     }
 
   }

@@ -18,4 +18,8 @@ class CityCntrl extends Controller {
     }
   }
 
+  def page(name: String) = Action {
+    Ok(views.html.base(views.html.city(name)))
+  }
+
 }

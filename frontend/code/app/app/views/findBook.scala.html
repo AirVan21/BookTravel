@@ -3,13 +3,18 @@
 <script src="@routes.Assets.versioned("javascripts/findBook.js")"></script>
 
 <div ng-controller="FindBookCtrl as ctrl" ng-init= "ctrl.reload()">
-  <md-content class="md-padding">
+  <md-input-container class="md-block">
+    <label>Input author or title name</label>
+    <input required name="description" ng-model="ctrl.input" ng-change="ctrl.onInputChanged()">
+  </md-input-container>
+
+  <!-- <md-content class="md-padding">
     <form ng-submit="$event.preventDefault()">
       <md-autocomplete
           md-autofocus="true"
           ng-disabled="ctrl.isDisabled"
           md-no-cache="ctrl.noCache"
-          md-selected-item="ctrl.selectedItem"
+          md-selected-item="gctrl.selectedItem"
           md-search-text="ctrl.searchText"
           md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
           md-selected-item-change="ctrl.selectedItemChange(item)"
@@ -22,9 +27,6 @@
           <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">
             {{item.title}}
           </span>
-<!--           <span ng-repeat="author in item.authors">
-            <h4>{{author.firstName}} {{author.lastName}}</h4>
-          </span> -->
         </md-item-template>
         <md-not-found>
           No books matching "{{ctrl.searchText}}" were found.
@@ -32,20 +34,19 @@
       </md-autocomplete>
       <br/>
     </form>
-  </md-content>
+  </md-content> -->
 
-  <!-- <md-list>
-    <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.books" ng-href="book/{{book.id}}">
+  <md-list>
+    <md-list-item class="md-2-line" ng-repeat="book in ctrl.books" ng-click="gctrl.gotoBook(book.id)">
       <div class="md-list-item-text">
         <h3> {{book.title}} </h3>
-        <div ng-repeat="author in book.authors" align="right">
-          <h4>{{author.firstName}} {{author.lastName}}</h4>
-        </div>
-        <div ng-repeat="quote in book.quotes">
-          <p> {{quote}} </p>
-        </div>
+        <h4>
+          <span ng-repeat="author in book.authors">
+            {{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}
+          </span>
+        </h4>
       </div>
       <md-divider ></md-divider>
     </md-list-item>
-  </md-list> -->
+  </md-list>
 </div>

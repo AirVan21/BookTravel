@@ -40,9 +40,6 @@ object City {
       "cityName" -> BSONDocument("$regex" -> ("^" + prefix), "$options" -> "i")
     )
 
-    // Logger.debug(s"LOL")
-    // println("LOL")
-
     collection.
     find(query).
     cursor[City]().

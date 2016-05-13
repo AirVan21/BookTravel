@@ -16,23 +16,30 @@ import scala.concurrent.duration._
 class BookCntrl extends Controller {
 
   def searchCity(cityName: String) = Action.async {
-    Book.findByCityName(DB.books)(cityName) map { books =>
-      implicit val writes = Book.getSimpleBookWrites(cityName)
+    for {
+      books <- Book.findByCityName(DB.books)(cityName)
+      quotes <- Quote.findByIds(DB.quotes)(books.map(book => book.getQuoteByCityName(cityName)).flatten.flatten)
+    } yield {
+      val quotesMap = quotes.groupBy(_._id) mapValues { _.head }
+      implicit val writes = Book.getSimpleBookWrites(cityName)(quotesMap)
       Ok(Json.toJson(books))
     }
   }
 
   def get(titleId: String) = Action.async {
-    (for {
+    val result = for {
       book <- Book.findById(DB.books)(titleId) map { case Some(book) => book }
       citiesOption <- City.findMultiple(DB.cities)(book.getCityNames)
+      quotes <- Quote.findByIds(DB.quotes)(book.getQuoteIds) 
     } yield {
       val cityMap = (citiesOption match {
         case cities: List[City] => cities.groupBy(_.cityName)
       }) mapValues { _.head }
-      implicit val bookWrites = Book.getWrites(cityMap)
+      val quotesMap = quotes.groupBy(_._id) mapValues { _.head }
+      implicit val bookWrites = Book.getWrites(cityMap)(quotesMap)
       Ok(Json.toJson(book))
-    }) recover { case _ => NotFound("No such book in DB.") }
+    }
+    result recover { case _ => NotFound("No such book in DB.") }
   }
 
   def page(titleId: String) = Action {
@@ -53,14 +60,20 @@ class BookCntrl extends Controller {
 
   def searchBook(words: String) = Action.async {
     Book.findByTitleOrAuthor(DB.books)(words.split(" ").toList) map {books =>
-      implicit val writes = Book.getSimpleBookWrites("")
+      implicit val writes = Book.getSimpleBookWrites("")(Map())
       Ok(Json.toJson(books))
+    }
+  }
+
+  def getBookCount = Action.async {
+    DB.books.stats map { stats =>
+      Ok(Json.toJson((stats.count + 49) / 50))
     }
   }
 
   def getList(pageNum: Int) = Action.async {
     Book.getInRange(DB.books)((pageNum - 1) * 50, 50) map { books =>
-      implicit val writes = Book.getSimpleBookWrites("")
+      implicit val writes = Book.getSimpleBookWrites("")(Map())
       Ok(Json.toJson(books))
     }
   }

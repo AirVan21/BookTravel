@@ -4,37 +4,90 @@
 <script src="@routes.Assets.versioned("javascripts/book.js")"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/jquery-jvectormap-2.0.3.css")" type="text/css" media="screen"/>
 <script src="@routes.Assets.versioned("javascripts/jquery-jvectormap-2.0.3.min.js")"></script>
-<script src="http://jvectormap.com/js/jquery-jvectormap-world-mill.js"></script>
+<link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/jquery-jvectormap-2.0.3.css")" type="text/css" media="screen"/>
+<script src="@routes.Assets.versioned("javascripts/jquery-jvectormap-world-mill.js")"></script>
+
+<link href="@routes.Assets.versioned("stylesheets/jquery.circliful.css")" rel="stylesheet" type="text/css" />
+<script src="@routes.Assets.versioned("javascripts/jquery.circliful.min.js")"></script>
+
+<style>
+  .red {
+    background: #D3D3D3; /* Цвет фона */
+  }
+</style>
 
 <div ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@titleId');" layout="row" layout-xs="column">
   <div flex>
-    <div  style="position: fixed; left: 0%; right: 50%;">
-      <h2> {{ctrl.data.title}} </h2>
-      <div align="right">
-            <h4 ng-repeat="author in ctrl.data.authors">{{author.firstName}} {{author.lastName}}</h4>
+    <div flex>
+      <div style="position: fixed; left: 0%; right: 50%;">
+        <h2> {{ctrl.data.title}} </h2>
+        <div>
+          <h4 ng-repeat="author in ctrl.data.authors">{{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}</h4>
+        </div>
+        <span>{{ctrl.data.description}}</span>
       </div>
+      
     </div>
     <div id="world-map" class="inbottom" style="right: 50%; max-height: 60%;"></div>
-
   </div>
-  <div flex>
+  <div layout="row" flex layout-wrap>
+<!--     <div class="row">
+      <div class="col-lg-2">
+        <div id="test-circle"></div>
+      </div>
+    </div> -->
     <md-list>
-      <md-list-item class="md-3-line md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
+      <md-list-item class="md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
         <div id={{cityCtx.city.name}} class="md-list-item-text">
-          <h3> <b> {{cityCtx.city.name}} </b> </h3>
+          <h3> 
+            <b ng-click="ctrl.changeColor(cityCtx.city.name)"> {{cityCtx.city.name}} </b> 
+          </h3>
           <md-list>
-            <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index">
-              <div class="md-list-item-text">
-                {{quote}}
-              <md-divider ></md-divider>
+            <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index"
+              ng-class="{red: hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false">
+              <div class="md-list-item-text" layout="row" style="margin-bottom: 10px; margin-top: 10px;" >
+      <!--           <div flex="none">
+                  <i class="material-icons" 
+                    style="font-size: 16px; cursor: pointer;" 
+                    ng-style="stylep"
+                    ng-click="gctrl.addPositive(cityCtx.city.name + $index + 'p'); stylep = {'color' : 'blue'} " 
+                    ng-attr-id="{{ $index }}">thumb_up</i>
+                  <i class="material-icons" 
+                    style="font-size: 16px; cursor: pointer;"
+                    ng-style="stylen"
+                    ng-click="gctrl.addNegative(cityCtx.city.name + $index + 'n'); stylen = {'color' : 'blue'} "
+                    ng-attr-id="{{ $index }}">thumb_down</i>
+                  <div ng-switch="quote.sentiment">
+                    <span ng-switch-when="POSITIVE" ng-style="{color:'green'}">{{quote.sentiment}}</span>
+                    <span ng-switch-when="NEGATIVE" ng-style="{color:'red'}">{{quote.sentiment}}</span>
+                    <span ng-switch-default ng-style="{color:'blue'}">{{quote.sentiment}}</span>
+                  </div>
+                </div> -->
+                <div flex>
+                  {{quote.text}}
+                  <!-- <span ng-style="{color:'red'}">{{quote.sentiment}}</span>> -->
+                  
+                </div>
+              </div>
             </md-list-item>
           </md-list>
           
+          <!-- <md-divider ></md-divider> -->
         </div>
-        <md-divider ></md-divider>
       </md-list-item>
+      <md-divider ></md-divider>
     </md-list>
   </div>
 </div>
+
+<script>
+$(document).ready(function() {
+  $("#test-circle").circliful({
+    animationStep: 5,
+    foregroundBorderWidth: 5,
+    backgroundBorderWidth: 15,
+    percent: 15
+  });
+});
+</script>

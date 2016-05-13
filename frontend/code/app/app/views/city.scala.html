@@ -1,0 +1,36 @@
+@(titleId: String)
+
+<center>
+  <h1>@titleId</h1>
+</center>
+
+<script src="@routes.Assets.versioned("javascripts/city.js")"></script>
+
+<div ng-controller="CityCtrl as ctrl" ng-init="ctrl.reload('@titleId');" layout="row" layout-xs="column">
+  
+  <md-list style="width: 100%;">
+    <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.data" ng-click="gctrl.gotoBook(book.id)" >
+      <!-- <md-card>
+       <img src="card-image.png" class="md-card-image" alt="image caption">
+       <md-card-content>
+         <h2>Card headline</h2>
+         <p>Card content</p>
+       </md-card-content>
+       <md-card-footer>
+         Card footer
+       </md-card-footer>
+      </md-card> -->
+      <img ng-src="@routes.Assets.versioned("images/Book.jpg")" class="md-avatar-icon" alt="{{book.id}}" style="height: 20%;" />
+      <div class="md-list-item-text">
+        <h3> {{book.title}} </h3>
+        <h4>
+          <span ng-repeat="author in book.authors">
+            {{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}
+          </span>
+        </h4>
+        <p ng-repeat="n in [] | range:3" style="margin-bottom: 5px; margin-top: 5px;"> {{book.quotes[n].text}} </p>
+      </div>
+      <!-- <md-divider ></md-divider> -->
+    </md-list-item>
+  </md-list>
+</div>

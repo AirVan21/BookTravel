@@ -16,6 +16,7 @@ class Upload extends Controller {
 
   val dir: File = new File("uploaded")
   dir.mkdir()
+  println(dir.getAbsolutePath)
 
   def file = Action(parse.multipartFormData) { request =>
     request.body.file("book").map { book =>

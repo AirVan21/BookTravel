@@ -19,5 +19,6 @@ object DB {
 
   val books = db("books")
   val cities = db("cities")
+  val quotes = db("quotes")
 
 }

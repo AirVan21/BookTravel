@@ -8,7 +8,7 @@ web:
   image: nizshee/geobook:0.2
   volumes:
     - ./logs:/code/logs
-    - ./uploaded:/code/uploaded
+    - ./uploaded:/code/app-1.0-SNAPSHOT/uploaded
   working_dir: /code
   command: [app-1.0-SNAPSHOT/bin/app, -Dplay.crypto.secret=AosjciSWGnqmEX5ZW6hd8cdCR8Qh]
   ports:
@@ -24,6 +24,7 @@ db_restore:
   command: |
     bash -c "
     mongorestore -h db --drop --db geobook --collection cities /data/Cities/City.bson;
-    mongorestore -h db --drop --db geobook --collection books /data/Books/Book.bson;"
+    mongorestore -h db --drop --db geobook --collection books /data/Books/Book.bson;
+    mongorestore -h db --drop --db geobook --collection quotes /data/Books/Quote.bson;"
   links:
     - db
