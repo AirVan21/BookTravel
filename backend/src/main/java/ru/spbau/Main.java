@@ -25,37 +25,6 @@ import java.util.stream.Collectors;
 
 public class Main {
 
-    public static void statisticsQuery() throws IOException {
-        BookStatistics statistics = new BookStatistics();
-        final String pathToTarget = "./data/csv/sentence_length.csv";
-        final String pathToSentimental = "./data/csv/sentence_sentiment.csv";
-
-        MongoClient mongo = new MongoClient();
-        Datastore datastore = new Morphia().createDatastore(mongo, "Books");
-        List<BookRecord> query = datastore.find(BookRecord.class).asList().subList(0, 10);
-
-        for (BookRecord record : query) {
-            if (record.getCities() != null) {
-                statistics.addBookStatistics(record);
-            }
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathToSentimental))) {
-            statistics
-                    .getSentimentScore()
-                    .stream()
-                    .forEach(score -> {
-                        try {
-                            writer.write(score.toString());
-                            writer.write("\n");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-        }
-
-    }
-
     public static void runCitiesDBCreation() throws FileNotFoundException {
         final String pathToCSV = "./data/csv/cities/cities-part1.csv";
 
@@ -84,10 +53,6 @@ public class Main {
         BookDatabaseGenerator.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
     }
 
-    public static void runBookSearchTest() throws Exception {
-        final String title = "Jane Eyre";
-    }
-
     public static void runCitiesRequest() {
         MongoClient mongo = new MongoClient();
         Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
@@ -113,8 +78,6 @@ public class Main {
 //        runCitiesRequest();
 //        runCitiesDBCreation();
         runBooksDBCreation();
-//        runBookSearchTest();
-//        statisticsQuery();
 //        runGeoSearchTest();
     }
 }

@@ -66,7 +66,7 @@ public class BookDatabaseGenerator {
                     if (bookRecord.setDescriptionFromBooksAPI(dataFromGoogleBooks.get()) &&
                             bookRecord.setCoverLinkFromBooksAPI(dataFromGoogleBooks.get())) {
                         System.out.println(bookRecord);
-//                        bookRecord.saveInDatabase(ds);
+                        bookRecord.saveInDatabase(ds);
                     }
                 }
             }
@@ -96,6 +96,9 @@ public class BookDatabaseGenerator {
                     quote.modifySentiment(annotation);
                     quote.modifyIsNotable(annotation);
                 }));
+
+        locationList
+                .forEach(LocationEntity::skipMeaninglessQuotes);
 
         return locationList;
     }

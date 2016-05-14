@@ -38,7 +38,7 @@ public class BookRecord {
 
     public void saveInDatabase(Datastore ds) {
         cities
-                .forEach(city -> city.saveQuotesInDatabese(ds));
+                .forEach(city -> city.saveQuotesInDatabase(ds));
         ds.save(this);
     }
 

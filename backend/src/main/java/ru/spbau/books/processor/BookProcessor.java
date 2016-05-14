@@ -6,6 +6,7 @@ import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.WordToSentenceProcessor;
 import ru.spbau.books.decisions.LengthJudge;
+import ru.spbau.books.decisions.SymbolJudge;
 import ru.spbau.database.LocationEntity;
 import ru.spbau.epubParser.EPUBHandler;
 
@@ -31,8 +32,10 @@ public class BookProcessor {
         final String bookText = EPUBHandler.readFromPath(pathToBook);
 
         final LengthJudge lengthJudge = new LengthJudge();
+        final SymbolJudge symbolJudge = new SymbolJudge();
         final Stream<String> sentences = tokenizeBook(bookText)
-                .filter(lengthJudge::shouldAccept);
+                .filter(lengthJudge::shouldAccept)
+                .filter(symbolJudge::shouldAccept);
 
         return sentences
                 .flatMap(sentence -> locationEntityStream(sentence, recognizer.classifySentence(sentence)))

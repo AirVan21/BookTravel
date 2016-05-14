@@ -31,6 +31,6 @@ public class CityDatabaseGenerator {
                 .map(CityEntry::getFormattedName)
                 .map(cityName -> new CityRecord(cityName, GeoSearcher.getCityCoordinates(cityName)))
                 .filter(record -> record.getLocations() != null)
-                .forEach(record -> ds.save(record));
+                .forEach(ds::save);
     }
 }
