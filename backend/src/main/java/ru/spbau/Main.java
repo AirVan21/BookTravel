@@ -1,7 +1,5 @@
 package ru.spbau;
 
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.mongodb.MongoClient;
 import com.opencsv.CSVReader;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
@@ -10,46 +8,32 @@ import edu.stanford.nlp.ling.CoreLabel;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
-import ru.spbau.archiveManager.ArchiveManager;
-import ru.spbau.books.decisions.SentimentJudge;
+import org.mongodb.morphia.aggregation.Accumulator;
+import org.mongodb.morphia.aggregation.Group;
+import org.mongodb.morphia.aggregation.Sort;
+import ru.spbau.archiveManager.BookDatabaseGenerator;
+import ru.spbau.archiveManager.CityDatabaseGenerator;
 import ru.spbau.csvHandler.CSVHandler;
 import ru.spbau.csvHandler.CityEntry;
 import ru.spbau.database.BookRecord;
 import ru.spbau.database.CityRecord;
-import ru.spbau.books.nerWrapper.NERWrapper;
 import ru.spbau.books.statistics.BookStatistics;
-import ru.spbau.googleAPI.BookSearcher;
 
 import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
-    public static void statisticsQuery() throws IOException {
-        BookStatistics statistics = new BookStatistics();
-        final String pathToTarget = "./data/csv/sentence_length.csv";
-
-        MongoClient mongo = new MongoClient();
-        Datastore datastore = new Morphia().createDatastore(mongo, "Books");
-        List<BookRecord> query = datastore.find(BookRecord.class).asList();
-
-        for (BookRecord record : query) {
-            if (record.cities != null) {
-                // TODO: fix records with empty cities (no not add them to DB)
-                statistics.addBookStatistics(record);
-            }
-        }
-    }
-
     public static void runCitiesDBCreation() throws FileNotFoundException {
-        final String pathToCSV = "./data/csv/world_cities.csv";
+        final String pathToCSV = "./data/csv/cities/cities-part1.csv";
 
         MongoClient mongo = new MongoClient();
         Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
 
         CSVReader reader = new CSVReader(new FileReader(pathToCSV));
         List<CityEntry> entries = CSVHandler.parse(reader);
-        ArchiveManager.generateCityDataBase(entries, datastore);
+        CityDatabaseGenerator.fillDatabase(entries, datastore);
 
         List<CityRecord> query = datastore.find(CityRecord.class).field("cityName").containsIgnoreCase("U.S.").asList();
         System.out.println("SELECT COUNT = " + query.size());
@@ -66,19 +50,34 @@ public class Main {
         Datastore datastore = new Morphia().createDatastore(mongoBook, "Books");
 
         AbstractSequenceClassifier<CoreLabel> serializedClassifier = CRFClassifier.getClassifier(pathToSerializedClassifier);
-        ArchiveManager.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
+        BookDatabaseGenerator.generateBookDataBase(pathToSmallIndex, serializedClassifier, datastore, citiesDatastore);
     }
 
-    public static void runBookSearchTest() throws Exception {
-        JsonFactory factory = new JacksonFactory();
-        final String title = "America's War for Humanity";
-        BookSearcher.queryGoogleBooks(factory, title);
+    public static void runCitiesRequest() {
+        MongoClient mongo = new MongoClient();
+        Datastore datastore = new Morphia().createDatastore(mongo, "Cities");
+
+//        List<CityRecord> query = datastore.find(CityRecord.class).asList()
+//                .stream()
+//                .filter(item -> item.getLocations() == null)
+//                .collect(Collectors.toList());
+
+//        List<CityRecord> req = datastore
+//                .find(CityRecord.class)
+//                .field("cityName")
+//                .containsIgnoreCase("Salt Lake City")
+//                .asList();
+//
+//        datastore.delete(req.get(0));
+
 
     }
 
-
-    public static void main(String[] args) throws Exception {
-//        runBooksDBCreation();
-        runBookSearchTest();
+    public static void main(String[] args) throws Exception
+    {
+//        runCitiesRequest();
+//        runCitiesDBCreation();
+        runBooksDBCreation();
+//        runGeoSearchTest();
     }
 }

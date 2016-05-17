@@ -6,7 +6,8 @@ import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.WordToSentenceProcessor;
 import ru.spbau.books.decisions.LengthJudge;
-import ru.spbau.database.LocationPair;
+import ru.spbau.books.decisions.SymbolJudge;
+import ru.spbau.database.LocationEntity;
 import ru.spbau.epubParser.EPUBHandler;
 
 import java.io.IOException;
@@ -27,19 +28,21 @@ public class BookProcessor {
         recognizer = new LocationRecognizer(classifier);
     }
 
-    public List<LocationPair> processBook(String pathToBook) throws IOException {
+    public List<LocationEntity> processBook(String pathToBook) throws IOException {
         final String bookText = EPUBHandler.readFromPath(pathToBook);
 
         final LengthJudge lengthJudge = new LengthJudge();
+        final SymbolJudge symbolJudge = new SymbolJudge();
         final Stream<String> sentences = tokenizeBook(bookText)
-                .filter(lengthJudge::makeDecision);
+                .filter(lengthJudge::shouldAccept)
+                .filter(symbolJudge::shouldAccept);
 
         return sentences
                 .flatMap(sentence -> locationEntityStream(sentence, recognizer.classifySentence(sentence)))
-                .collect(groupingBy(LocationEntity::getLocation, mapping(LocationEntity::getSentence, toList())))
+                .collect(groupingBy(BookProcessor.LocationPair::getLocation, mapping(BookProcessor.LocationPair::getSentence, toList())))
                 .entrySet()
                 .stream()
-                .map(entity -> new LocationPair(entity.getKey(), entity.getValue()))
+                .map(entity -> new LocationEntity(entity.getKey(), entity.getValue()))
                 .collect(toList());
     }
 
@@ -72,16 +75,16 @@ public class BookProcessor {
         return bookText.substring(start, end).trim();
     }
 
-    private Stream<LocationEntity> locationEntityStream(String sentence, Stream<String> locations) {
+    private Stream<LocationPair> locationEntityStream(String sentence, Stream<String> locations) {
         return locations
-                .map(location -> new LocationEntity(location, sentence));
+                .map(location -> new LocationPair(location, sentence));
     }
 
-    private static class LocationEntity {
+    private static class LocationPair {
         private final String location;
         private final String sentence;
 
-        public LocationEntity(String location, String sentence) {
+        public LocationPair(String location, String sentence) {
             this.location = location;
             this.sentence = sentence;
         }

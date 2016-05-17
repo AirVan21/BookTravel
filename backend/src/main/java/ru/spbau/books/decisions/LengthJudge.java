@@ -8,7 +8,7 @@ public class LengthJudge implements Judge {
     public final static int maximalLength = 400;
 
     @Override
-    public boolean makeDecision(String sentence) {
+    public boolean shouldAccept(String sentence) {
         return sentence.length() <= maximalLength && sentence.length() >= minimalLength;
     }
 }

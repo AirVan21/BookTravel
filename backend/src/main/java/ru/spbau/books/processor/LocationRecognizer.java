@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * Created by airvan21 on 09.04.16.
  */
 public class LocationRecognizer {
-    private final static String searchTag = "LOCATION";
+    private final static String SEARCH_TAG = "LOCATION";
     private final AbstractSequenceClassifier<CoreLabel> classifier;
 
     public LocationRecognizer(AbstractSequenceClassifier<CoreLabel> classifier) {
@@ -22,7 +22,7 @@ public class LocationRecognizer {
         final List<Triple<String, Integer, Integer>> tagsFromSentence = classifier.classifyToCharacterOffsets(sentence);
 
         return tagsFromSentence.stream()
-                .filter(description -> description.first.equals(searchTag))
+                .filter(description -> description.first.equals(SEARCH_TAG))
                 .map(item -> sentence.substring(item.second, item.third))
                 .map(String::trim)
                 .distinct();

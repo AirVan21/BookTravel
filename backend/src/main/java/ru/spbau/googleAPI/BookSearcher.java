@@ -1,35 +1,76 @@
 package ru.spbau.googleAPI;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.books.Books;
 import com.google.api.services.books.BooksRequestInitializer;
 import com.google.api.services.books.model.Volume;
 import com.google.api.services.books.model.Volumes;
+import ru.spbau.database.BookAuthor;
 
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
-    private static final String googleAPICode = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
-    private static final String APPLICATION_NAME = "BookTravel";
+    public static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
+    public static final String APPLICATION_NAME = "BookTravel";
+    private static final long MAX_SEARCH_RESULT = 5;
+    private final Books bookManager;
 
-    public static void queryGoogleBooks(JsonFactory jsonFactory, String query) throws Exception {
-        // Set up Books client.
-        final Books books = new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), jsonFactory, null)
-                .setApplicationName(APPLICATION_NAME)
-                .setGoogleClientRequestInitializer(new BooksRequestInitializer(googleAPICode))
-                .build();
+    public BookSearcher (Books bookManager) {
+        this.bookManager = bookManager;
+    }
 
-        // Set query string and filter only Google eBooks.
-        System.out.println("Query: [" + query + "]");
-        Books.Volumes.List volumesList = books.volumes().list(query);
-        volumesList.setMaxResults((long) 5);
-        volumesList.setPrintType("books");
-        volumesList.setOrderBy("relevance");
-        volumesList.setFilter("ebooks");
+    public Optional<Volumes> performQuery(String title, List<BookAuthor> authors) {
+        String query = buildQuery(title, authors);
+        Volumes volumes = null;
+
+        try {
+            volumes = executeQuery(query);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+
+        if (volumes.getTotalItems() == 0 || volumes.getItems() == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(volumes);
+    }
+
+    public static Optional<String> getBookDescription(Volumes volumes) {
+        for (Volume volume : volumes.getItems()) {
+            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+
+            if (volumeInfo.getDescription() != null) {
+                return Optional.of(volumeInfo.getDescription());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<String> getBookCoverLink(Volumes volumes) {
+        for (Volume volume : volumes.getItems()) {
+            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+            Volume.VolumeInfo.ImageLinks links = volumeInfo.getImageLinks();
+            if (links != null && links.getSmallThumbnail() != null) {
+                return Optional.of(links.getSmallThumbnail());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public void queryGoogleBooks(String query) throws Exception {
+        Books.Volumes.List volumesList = bookManager.volumes().list(query);
+        setSearchParameters(volumesList);
 
         // Execute the query.
         Volumes volumes = volumesList.execute();
@@ -41,14 +82,12 @@ public class BookSearcher {
         // Output results.
         for (Volume volume : volumes.getItems()) {
             Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-            Volume.SaleInfo saleInfo = volume.getSaleInfo();
-            System.out.println("==========");
-            // Title.
+
+            // Title
             System.out.println("Title: " + volumeInfo.getTitle());
-            // Image link
-            System.out.println(volumeInfo.getImageLinks());
             // Author(s).
-            java.util.List<String> authors = volumeInfo.getAuthors();
+            List<String> authors = volumeInfo.getAuthors();
+
             if (authors != null && !authors.isEmpty()) {
                 System.out.print("Author(s): ");
                 for (int i = 0; i < authors.size(); ++i) {
@@ -70,10 +109,38 @@ public class BookSearcher {
                 System.out.print("User Rating: " + volumeInfo.getAverageRating().doubleValue());
                 System.out.println(" (" + volumeInfo.getRatingsCount() + " rating(s))");
             }
-
-            // Link to Google eBooks.
-            System.out.println(volumeInfo.getInfoLink());
         }
-        System.out.println("==========");
+    }
+
+    public static Books generateBooksManager(String applicationName, String apiCode) throws GeneralSecurityException, IOException {
+        return new Books.Builder(GoogleNetHttpTransport.newTrustedTransport(), new JacksonFactory(), null)
+                .setApplicationName(applicationName)
+                .setGoogleClientRequestInitializer(new BooksRequestInitializer(apiCode))
+                .build();
+    }
+
+    private Volumes executeQuery(String query) throws IOException {
+        Books.Volumes.List volumesList = bookManager.volumes().list(query);
+        setSearchParameters(volumesList);
+
+        return volumesList.execute();
+    }
+
+    private static String buildQuery(String title, List<BookAuthor> authors) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(title);
+        authors.forEach(bookAuthor -> { sb.append(" "); sb.append(bookAuthor); });
+
+        return sb.toString();
+    }
+
+    /**
+     *
+     * @param volumesList
+     */
+    private static void setSearchParameters(Books.Volumes.List volumesList) {
+        volumesList.setMaxResults(MAX_SEARCH_RESULT);
+        volumesList.setPrintType("books");
+        volumesList.setOrderBy("relevance");
     }
 }

@@ -18,13 +18,12 @@ public class EPUBHandler {
         final StringBuilder text = new StringBuilder();
 
         for (SpineReference bookSection : spine.getSpineReferences()) {
-            Resource res = bookSection.getResource();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(res.getInputStream()));
-
+            final BufferedReader reader = new BufferedReader(bookSection.getResource().getReader());
 
             String line;
             while ((line = reader.readLine()) != null) {
                 text.append(line);
+                text.append(" ");
             }
         }
         // Removes HTML tags
@@ -38,5 +37,30 @@ public class EPUBHandler {
         return book.getMetadata();
     }
 
+    /**
+     * Checks EPUBs metadata structure
+     * @param metadata - books meta-info from epublib
+     * @return true    - approves book
+     *         false   - rejects book
+     */
+    public static boolean isEPUBValid(Metadata metadata) {
+        if (!metadata.getLanguage().equals("en")) {
+            return false;
+        }
 
+        if (metadata.getFirstTitle().equals("")) {
+            return  false;
+        }
+
+        if (metadata.getAuthors().size() == 0) {
+            return false;
+        }
+
+        if (metadata.getAuthors().get(0).getFirstname().equals("") ||
+                metadata.getAuthors().get(0).getLastname().equals("")) {
+            return false;
+        }
+
+        return true;
+    }
 }
