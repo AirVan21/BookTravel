@@ -26,7 +26,7 @@ object Quotes {
       "quotes" -> Json.toJson(quotes.quotes map { quote => quoteMap.get(quote.id) match {
         case Some(real) => Json.toJson(real)
         case _ => null
-      } } filter { x => x != null} )
+      } } filter { _ != null} )
     )
   }
 }

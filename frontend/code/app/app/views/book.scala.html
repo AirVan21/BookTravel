@@ -17,8 +17,63 @@
   }
 </style>
 
-<div ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@titleId');" layout="row" layout-xs="column">
-  <div flex>
+<div ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@titleId');">
+
+  <div>
+    <div style="position: fixed; overflow-y: auto; height: 30%;">
+    <div layout="row">
+      <div flex="none">
+        <img ng-src="{{ctrl.data.picture}}" alt="{{ctrl.data.picture}}" 
+        style="max-height: 29%; margin-left: 5%; margin-top: 5%;" />
+      </div>
+      <div flex style="margin-left: 5%;">
+        
+        <div>
+          <h2> {{ctrl.data.title}} </h2>
+          <div>
+            by
+            <h4 style="display: inline;" ng-repeat="author in ctrl.data.authors">
+              {{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}</h4>
+          </div>
+          <span><b>Description:</b> {{ctrl.data.description}}</span>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div> 
+      <div >
+        
+        <div id="world-map" class="inbottom" style="position: fixed; right: 50%; max-height: 60%;"></div>
+
+        <div class="inbottom" style="left: 50%; max-height: 60%;">
+          <md-list>
+            <md-list-item class="md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
+              <div id={{cityCtx.city.name}} class="md-list-item-text">
+                <h3> 
+                  <b ng-click="ctrl.changeColor(cityCtx.city.name)"> {{cityCtx.city.name}} </b> 
+                </h3>
+                <md-list>
+                  <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index"
+                    ng-class="{red: hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false">
+                    <div class="md-list-item-text" layout="row" style="margin-bottom: 10px; margin-top: 10px;" >
+                      <div flex>
+                        {{quote.text}}
+                        
+                      </div>
+                    </div>
+                  </md-list-item>
+                </md-list>
+              </div>
+            </md-list-item>
+            <!-- <md-divider ></md-divider> -->
+          </md-list>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<!--   <div flex>
     <div flex>
       <div style="position: fixed; left: 0%; right: 50%;">
         <h2> {{ctrl.data.title}} </h2>
@@ -32,11 +87,6 @@
     <div id="world-map" class="inbottom" style="right: 50%; max-height: 60%;"></div>
   </div>
   <div layout="row" flex layout-wrap>
-<!--     <div class="row">
-      <div class="col-lg-2">
-        <div id="test-circle"></div>
-      </div>
-    </div> -->
     <md-list>
       <md-list-item class="md-long-text" ng-repeat="cityCtx in ctrl.data.cities">
         <div id={{cityCtx.city.name}} class="md-list-item-text">
@@ -47,6 +97,23 @@
             <md-list-item class="md-1-line md-long-text" ng-repeat="quote in cityCtx.quotes track by $index"
               ng-class="{red: hover}" ng-mouseenter="hover = true" ng-mouseleave="hover = false">
               <div class="md-list-item-text" layout="row" style="margin-bottom: 10px; margin-top: 10px;" >
+                <div flex>
+                  {{quote.text}}
+                  
+                </div>
+              </div>
+            </md-list-item>
+          </md-list>
+        </div>
+      </md-list-item>
+      <md-divider ></md-divider>
+    </md-list>
+  </div>
+</div> -->
+
+
+      <!-- <span ng-style="{color:'red'}">{{quote.sentiment}}</span>> -->
+
       <!--           <div flex="none">
                   <i class="material-icons" 
                     style="font-size: 16px; cursor: pointer;" 
@@ -64,23 +131,9 @@
                     <span ng-switch-default ng-style="{color:'blue'}">{{quote.sentiment}}</span>
                   </div>
                 </div> -->
-                <div flex>
-                  {{quote.text}}
-                  <!-- <span ng-style="{color:'red'}">{{quote.sentiment}}</span>> -->
-                  
-                </div>
-              </div>
-            </md-list-item>
-          </md-list>
-          
-          <!-- <md-divider ></md-divider> -->
-        </div>
-      </md-list-item>
-      <md-divider ></md-divider>
-    </md-list>
-  </div>
-</div>
 
+
+<!-- 
 <script>
 $(document).ready(function() {
   $("#test-circle").circliful({
@@ -91,3 +144,4 @@ $(document).ready(function() {
   });
 });
 </script>
+ -->

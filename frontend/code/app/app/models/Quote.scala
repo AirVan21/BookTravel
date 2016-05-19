@@ -31,11 +31,12 @@ object Quote {
   def findByIds(collection: BSONCollection)(ids: List[BSONObjectID]) = {
     val query = BSONDocument(
         "$or" -> (ids map { id => BSONDocument("_id" -> id) })
+        // "isNotable" -> true
     )
 
     collection.
     find(query).
-    sort(BSONDocument("raiting" -> -1)).
+    // sort(BSONDocument("raiting" -> -1)).
     cursor[Quote].
     collect[List](10000)
 

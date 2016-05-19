@@ -10,17 +10,8 @@
   
   <md-list style="width: 100%;">
     <md-list-item class="md-3-line md-long-text" ng-repeat="book in ctrl.data" ng-click="gctrl.gotoBook(book.id)" >
-      <!-- <md-card>
-       <img src="card-image.png" class="md-card-image" alt="image caption">
-       <md-card-content>
-         <h2>Card headline</h2>
-         <p>Card content</p>
-       </md-card-content>
-       <md-card-footer>
-         Card footer
-       </md-card-footer>
-      </md-card> -->
-      <img ng-src="@routes.Assets.versioned("images/Book.jpg")" class="md-avatar-icon" alt="{{book.id}}" style="height: 20%;" />
+      <!-- <img ng-src="@routes.Assets.versioned("images/Book.jpg")" class="md-avatar-icon" alt="{{book.id}}" style="height: 20%;" /> -->
+      <img ng-src="{{book.picture}}" class="md-avatar-icon" alt="{{book.id}}" style="height: 20%;" />
       <div class="md-list-item-text">
         <h3> {{book.title}} </h3>
         <h4>

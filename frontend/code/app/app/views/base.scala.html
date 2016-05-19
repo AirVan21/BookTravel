@@ -28,7 +28,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/app.css")">
- 
+
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+
 </head>
 
 <script type="text/javascript">
@@ -47,7 +49,7 @@
   };
 });
 
-  function ToolbarCtrl($log, $location, $http) {
+  function ToolbarCtrl($log, $location, $http, $timeout, $q) {
     var self = this;
 
     self.host = $location.protocol() + "://" + $location.host() + ":" + $location.port();
@@ -95,6 +97,46 @@
         });
       }
     }
+
+    self.querySearch   = getHttpResponse;
+    self.selectedItemChange = selectedItemChange;
+    self.searchTextChange   = searchTextChange;
+
+    self.books = []
+
+    function searchTextChange(text) {
+      $log.info('Text changed to ' + text);
+    }
+
+    function selectedItemChange(item) {
+      $log.info('Item changed to ' + JSON.stringify(item));
+      var name = item === undefined ? "" : item.name;
+      if (name != "") self.gotoCity(name);
+      // $location.hash(name);
+      // self.update(name);
+    }
+
+    function getHttpResponse(query) {
+      var deferred = $q.defer();
+      var lowercaseQuery = angular.lowercase(query);
+      $log.info(lowercaseQuery)
+
+      $http({
+        method : "GET",
+        url : self.host +"/city/search/" + lowercaseQuery,
+      }).then(function mySucces(r) {
+        var response = angular.fromJson(r);
+        deferred.resolve(response.data);
+        $log.info(response.data);
+      }, function myError(r) {
+        var response = angular.fromJson(r)
+        deferred.resolve([]);
+        $log.info(response);
+      });
+
+      return deferred.promise;
+    }
+
   }
 
 })();
@@ -103,22 +145,42 @@
 
 <body ng-app="MyApp">
   <div layout="column" layout-fill ng-controller="ToolbarCtrl as gctrl">
-    <md-toolbar>
+    <md-toolbar class="ng-cloak">
       <div class="md-toolbar-tools">
-        <span ng-click="gctrl.gotoHost()">Ultimate Book Search Service</span>
+        <font ng-click="gctrl.gotoHost()" face="Pacifico" style="cursor: pointer;">Book'N'Travel</font>
+
+          <span flex="5"></span>
+          <md-autocomplete
+              style="color: black;"
+              flex="50"
+              md-selected-item="gctrl.selectedItem"
+              md-search-text="gctrl.searchText"
+              md-search-text-change="gctrl.searchTextChange(gctrl.searchText)"
+              md-selected-item-change="gctrl.selectedItemChange(item)"
+              md-items="item in gctrl.querySearch(gctrl.searchText)"
+              md-item-text="item.name"
+              md-min-length="1"
+              placeholder="What city do you need?">
+            <md-item-template>
+              <span md-highlight-text="gctrl.searchText" md-highlight-flags="^i">{{item.name}}</span>
+            </md-item-template>
+            <md-not-found>
+              No cities matching "{{gctrl.searchText}}" were found.
+            </md-not-found>
+          </md-autocomplete>
+          <br/>
+            
         <span flex></span>
-        <md-button ng-href="{{gctrl.host}}">
-          find by city
-        </md-button>
+
         <md-button ng-href="{{gctrl.host}}/book/search">
-          find by author
+          find
         </md-button>
         <md-button ng-href="{{gctrl.host}}/book/list">
-          list
+          books
         </md-button>
       </div>
     </md-toolbar>
-    <md-content>
+    <md-content class="ng-cloak">
         @content
     </md-content>
   </div>

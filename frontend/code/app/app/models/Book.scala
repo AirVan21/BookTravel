@@ -18,7 +18,8 @@ case class Book(
   , title: String
   , authors: Option[List[Author]]
   , cities: List[Quotes]
-  , description: String) {
+  , description: String
+  , coverLink: String) {
 
   def getCityNames = cities map { _.cityName }
   def getQuoteIds = cities.map(quotes => quotes.getQuoteIds).flatten
@@ -34,6 +35,7 @@ object Book {
   val AUTHORS = "authors"
   val QUOTES = "quotes"
   val DESCRIPTION = "description"
+  val PICTURE = "picture"
 
   implicit val reader: BSONDocumentReader[Book] = Macros.reader[Book]
 
@@ -44,7 +46,8 @@ object Book {
       ID -> book._id.stringify,
       CITIES -> Json.toJson(book.cities),
       AUTHORS -> Json.toJson(book.authors),
-      DESCRIPTION -> Json.toJson(book.description)
+      DESCRIPTION -> Json.toJson(book.description),
+      PICTURE -> book.coverLink
     )
   }
 
@@ -56,11 +59,11 @@ object Book {
       QUOTES -> Json.toJson {
         val quotesOption = book.cities find { _.cityName == cityName}
         quotesOption match {
-          case Some(quotes) => quotes.quotes.take(3).map(x => quoteMap.get(x.id)).flatten
+          case Some(quotes) => quotes.quotes.take(2).map(x => quoteMap.get(x.id)).flatten
           case _ => List()
         }
-        
-      }
+      },
+      PICTURE -> book.coverLink
     )
   }
 
