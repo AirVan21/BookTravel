@@ -1,62 +1,36 @@
-<!-- 
-<script src="@routes.Assets.versioned("bower_components/angular-touch/angular-touch.min.js")"></script>
-<script src="@routes.Assets.versioned("bower_components/angular-carousel/src/angular-carousel.js")"></script>
-<script src="@routes.Assets.versioned("bower_components/angular-carousel/src/css/angular-carousel.scss")"></script> -->
-
-<!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-<!-- Optional theme -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-<script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("javascripts/index.js")"></script>
 
 <div ng-controller="AutocompleteCtrl as ctrl" ng-init= "ctrl.reload()">
 
  <div id="carousel-example-generic" class="carousel slide center-block" data-ride="carousel" style="width: 80%; margin-top: 1%;">
-    <!-- Indicators -->
     <ol class="carousel-indicators">
       <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
       <li data-target="#carousel-example-generic" ng-repeat="n in [] | range:ctrl.maxCities" data-slide-to="{{n + 1}}"></li>
-      <!-- <li data-target="#carousel-example-generic" data-slide-to="2"></li> -->
     </ol>
 
-    <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
 
       <div class="item active">
-        <img src="@routes.Assets.versioned("images/{{ctrl.firstCity}}.jpg")" alt="{{ctrl.firstCity}}">
+        <img ng-src="@routes.Assets.versioned("images/{{ctrl.firstCity}}.jpg")" alt="{{ctrl.firstCity}}">
         <div class="carousel-caption">
           <h1 ng-click="gctrl.gotoCity(ctrl.firstCity)">{{ctrl.firstCity}}</h1>
         </div>
       </div>
 
       <div ng-repeat="city in ctrl.getCities" class="item">
-        <img src="@routes.Assets.versioned("images/{{city}}.jpg")" alt="{{city}}">
+        <img ng-src="@routes.Assets.versioned("images/{{city}}.jpg")" alt="{{city}}">
         <div class="carousel-caption">
           <h1 ng-click="gctrl.gotoCity(city)">{{city}}</h1>
         </div>
       </div>
-
-      <!-- <div class="item">
-        <img src="@routes.Assets.versioned("images/Moscow.jpg")" alt="Moscow">
-        <div class="carousel-caption">
-          <h1 ng-click="gctrl.gotoCity('Moscow')">Moscow</h1>
-        </div>
-      </div>
-
-      <div class="item">
-        <img src="@routes.Assets.versioned("images/London.jpg")" alt="London">
-        <div class="carousel-caption">
-          <h1 ng-click="gctrl.gotoCity('London')">London</h1>
-        </div>
-      </div> -->
     </div>
 
-    <!-- Controls -->
     <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
       <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
       <span class="sr-only">Previous</span>
@@ -66,63 +40,5 @@
       <span class="sr-only">Next</span>
     </a>
   </div>
-
-
-  <!-- <div class="md-list-item-text" layout="row">
-    <div flex="30">
-      <h2>Top Cities:</h2>
-      <md-list>
-        <md-list-item class="md-1-line" ng-repeat="city in ctrl.topCities" ng-click="gctrl.gotoCity(city)" >
-          <div class="md-list-item-text">
-            <h4> {{city}} </h4>
-          </div>
-        </md-list-item>
-      </md-list>
-    </div>
-    <div flex> -->
-      
-      <!-- <md-content class="md-padding">
-        <form ng-submit="$event.preventDefault()">
-          <md-autocomplete
-              ng-disabled="ctrl.isDisabled"
-              md-no-cache="ctrl.noCache"
-              md-selected-item="ctrl.selectedItem"
-              md-search-text="ctrl.searchText"
-              md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
-              md-selected-item-change="ctrl.selectedItemChange(item)"
-              md-items="item in ctrl.querySearch(ctrl.searchText)"
-              md-item-text="item.name"
-              md-min-length="1"
-              placeholder="What city do you need?">
-            <md-item-template>
-              <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.name}}</span>
-            </md-item-template>
-            <md-not-found>
-              No cities matching "{{ctrl.searchText}}" were found.
-            </md-not-found>
-          </md-autocomplete>
-          <br/>
-        </form>
-      </md-content> -->
-<!-- 
-      <div style="overflow-y: auto; height: 80%;">
-        
-        <md-list>
-          <md-list-item class="md-3-line" ng-repeat="book in ctrl.books" ng-click="gctrl.gotoBook(book.id)" >
-            <div class="md-list-item-text">
-              <h3 style="width: 45em;"> {{book.title}} </h3>
-              <h4>
-                <span ng-repeat="author in book.authors">
-                  {{author.firstName}} {{author.lastName}} {{$last ? '' : ',  '}}
-                </span>
-              </h4>
-              <p> {{book.quotes[0].text}} </p>
-            </div>
-            <md-divider ></md-divider>
-          </md-list-item>
-        </md-list>
-      </div> -->
-    <!-- </div> -->
-  <!-- </div> -->
 
 </div>

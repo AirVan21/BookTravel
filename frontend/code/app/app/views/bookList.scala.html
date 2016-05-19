@@ -1,6 +1,6 @@
 @(pageNum: Int)
 
-<script src="@routes.Assets.versioned("javascripts/bookList.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("javascripts/bookList.js")"></script>
 
 
 <div flex ng-controller="ViewCtrl as ctrl" ng-init="ctrl.reload('@pageNum');">

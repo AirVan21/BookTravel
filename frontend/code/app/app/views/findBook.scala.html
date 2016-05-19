@@ -1,40 +1,12 @@
 
 
-<script src="@routes.Assets.versioned("javascripts/findBook.js")"></script>
+<script type="text/javascript" src="@routes.Assets.versioned("javascripts/findBook.js")"></script>
 
 <div ng-controller="FindBookCtrl as ctrl" ng-init= "ctrl.reload()">
   <md-input-container class="md-block">
     <label>Input author or title name</label>
     <input required name="description" ng-model="ctrl.input" ng-change="ctrl.onInputChanged()">
   </md-input-container>
-
-  <!-- <md-content class="md-padding">
-    <form ng-submit="$event.preventDefault()">
-      <md-autocomplete
-          md-autofocus="true"
-          ng-disabled="ctrl.isDisabled"
-          md-no-cache="ctrl.noCache"
-          md-selected-item="gctrl.selectedItem"
-          md-search-text="ctrl.searchText"
-          md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
-          md-selected-item-change="ctrl.selectedItemChange(item)"
-          md-items="item in ctrl.querySearch(ctrl.searchText)"
-          md-item-text="item.title"
-          md-min-length="1"
-          placeholder="What book or author do you need?"
-          md-menu-class="autocomplete-custom-template">
-        <md-item-template>
-          <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">
-            {{item.title}}
-          </span>
-        </md-item-template>
-        <md-not-found>
-          No books matching "{{ctrl.searchText}}" were found.
-        </md-not-found>
-      </md-autocomplete>
-      <br/>
-    </form>
-  </md-content> -->
 
   <md-list>
     <md-list-item class="md-2-line" ng-repeat="book in ctrl.books" ng-click="gctrl.gotoBook(book.id)">
