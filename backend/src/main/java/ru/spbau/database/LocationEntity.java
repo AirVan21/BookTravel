@@ -60,6 +60,7 @@ public class LocationEntity {
                 .collect(Collectors.toList());
 
         if (result.size() >= QUOTE_THRESHOLD) {
+            setQuotes(result);
             return;
         }
 

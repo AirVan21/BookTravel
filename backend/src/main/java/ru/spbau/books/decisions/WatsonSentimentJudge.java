@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class WatsonSentimentJudge implements SentimentJudge {
     private static final AlchemyLanguage SERVICE = new AlchemyLanguage();
-    private static final String API_KEY = "9b45f03b9b6d914419840a5f3c7ca911c3f33ae5";
+    private static final String API_KEY = "";
 
     public WatsonSentimentJudge() {
         SERVICE.setApiKey(API_KEY);

@@ -9,7 +9,7 @@ import java.util.Set;
  * Created by airvan21 on 14.05.16.
  */
 public class SymbolJudge implements Judge {
-    private static List<String> source = Arrays.asList("[", "]", "{", "}");
+    private static List<String> source = Arrays.asList("[", "]", "{", "}", "CHAPTER", "APPENDIX", "%");
     private static Set<String> forbiddenCharacters = new HashSet<>(source);
 
     @Override

@@ -18,7 +18,7 @@ import java.util.Optional;
  * Created by airvan21 on 13.04.16.
  */
 public class BookSearcher {
-    public static final String GOOGLE_API_CODE  = "AIzaSyBPGuEnVZcQarLwzByVquiP4D-lmc2Q9OY";
+    public static final String GOOGLE_API_CODE  = "";
     public static final String APPLICATION_NAME = "BookTravel";
     private static final long MAX_SEARCH_RESULT = 5;
     private final Books bookManager;
