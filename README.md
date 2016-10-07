@@ -15,3 +15,7 @@ BookTravel - is a service for representing interesting facts about cities from f
   * Stanford NLP
   * IBM Watson NLP
   * Play Framework
+  
+## Presentation (Russian languag):
+ [Google Presentation](https://docs.google.com/presentation/d/1zy6nDEYVZu5rFnjj95OP6tik2fHjm8u21sPGpkLjhsU/edit?usp=sharing)
+  
